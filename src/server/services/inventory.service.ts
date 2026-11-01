@@ -90,14 +90,73 @@ export async function listMovements(args: {
   return inventoryRepository(db).listMovements(ctx.business.businessId, args);
 }
 
+/** Every stock item that can be adjusted: green lots, roasted batches, packaging materials, finished lots. */
 export async function getAdjustmentFormOptions() {
   const ctx = await requirePermission("inventory.read");
   const db = await createSupabaseServerClient();
-  const [lots, locations] = await Promise.all([
-    inventoryRepository(db).allGreenLots(ctx.business.businessId),
-    masterDataRepository(db, "inventory_locations").listActive(ctx.business.businessId),
+  const bid = ctx.business.businessId;
+  const [lots, locations, roasted, materials, finished] = await Promise.all([
+    inventoryRepository(db).allGreenLots(bid),
+    masterDataRepository(db, "inventory_locations").listActive(bid),
+    db
+      .from("roast_batch_summary_view")
+      .select("id, batch_number, coffee_names, roasted_item_id, roasted_available_g")
+      .eq("business_id", bid)
+      .eq("status", "completed")
+      .not("roasted_item_id", "is", null),
+    db
+      .from("packaging_material_inventory_view")
+      .select("material_id, name, base_unit, inventory_item_id, available")
+      .eq("business_id", bid)
+      .eq("is_active", true),
+    db
+      .from("finished_goods_inventory_view")
+      .select("lot_id, lot_code, product_name, variant_name, inventory_item_id, available")
+      .eq("business_id", bid),
   ]);
-  return { lots: lots.filter((l) => l.inventory_item_id), locations };
+  const items: {
+    inventory_item_id: string;
+    label: string;
+    available: number;
+    unit: string;
+    group: string;
+  }[] = [
+    ...lots
+      .filter((l) => l.inventory_item_id)
+      .map((l) => ({
+        inventory_item_id: l.inventory_item_id!,
+        label: `${l.coffee_name} · ${l.lot_code}`,
+        available: l.available_g ?? 0,
+        unit: "g",
+        group: "Green coffee lots",
+      })),
+    ...(roasted.data ?? []).map((r) => ({
+      inventory_item_id: r.roasted_item_id!,
+      label: `${r.batch_number} · ${r.coffee_names ?? ""}`,
+      available: r.roasted_available_g ?? 0,
+      unit: "g",
+      group: "Roasted bulk",
+    })),
+    ...(materials.data ?? [])
+      .filter((m) => m.inventory_item_id)
+      .map((m) => ({
+        inventory_item_id: m.inventory_item_id!,
+        label: m.name,
+        available: m.available ?? 0,
+        unit: m.base_unit,
+        group: "Packaging materials",
+      })),
+    ...(finished.data ?? [])
+      .filter((f) => f.inventory_item_id)
+      .map((f) => ({
+        inventory_item_id: f.inventory_item_id!,
+        label: `${f.product_name} ${f.variant_name} · ${f.lot_code}`,
+        available: f.available ?? 0,
+        unit: "unit",
+        group: "Finished goods",
+      })),
+  ];
+  return { items, locations };
 }
 
 /** Create and post an inventory adjustment atomically. Idempotent on the key. */

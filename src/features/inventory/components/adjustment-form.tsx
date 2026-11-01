@@ -24,19 +24,22 @@ import { createInventoryAdjustmentAction } from "../actions";
 
 type FormValues = z.input<typeof inventoryAdjustmentSchema>;
 
-interface LotOption {
+interface ItemOption {
   inventory_item_id: string;
   label: string;
-  available_g: number;
+  available: number;
+  unit: string;
+  group: string;
 }
 
 interface Props {
-  lots: LotOption[];
+  items: ItemOption[];
   locations: { id: string; name: string }[];
   defaultItemId?: string;
 }
 
-export function AdjustmentForm({ lots, locations, defaultItemId }: Props) {
+export function AdjustmentForm({ items, locations, defaultItemId }: Props) {
+  const groups = [...new Set(items.map((i) => i.group))];
   const router = useRouter();
   const [formError, setFormError] = useState<string | null>(null);
   const [idempotencyKey] = useState(() => crypto.randomUUID());
@@ -128,7 +131,7 @@ export function AdjustmentForm({ lots, locations, defaultItemId }: Props) {
           ) : null}
           {fields.map((field, index) => {
             const lineErrors = errors.lines?.[index];
-            const selected = lots.find(
+            const selected = items.find(
               (l) => l.inventory_item_id === lines?.[index]?.inventory_item_id,
             );
             return (
@@ -139,11 +142,13 @@ export function AdjustmentForm({ lots, locations, defaultItemId }: Props) {
               >
                 <FormField
                   name={`lines.${index}.inventory_item_id`}
-                  label="Lot"
+                  label="Item"
                   error={lineErrors?.inventory_item_id?.message}
                   required
                   description={
-                    selected ? `Available: ${formatWeight(selected.available_g)}` : undefined
+                    selected
+                      ? `Available: ${selected.unit === "g" ? formatWeight(selected.available) : `${selected.available} ${selected.unit}`}`
+                      : undefined
                   }
                 >
                   <NativeSelect
@@ -151,11 +156,17 @@ export function AdjustmentForm({ lots, locations, defaultItemId }: Props) {
                     data-testid="select-lot"
                     {...form.register(`lines.${index}.inventory_item_id`)}
                   >
-                    <option value="">Select a lot…</option>
-                    {lots.map((l) => (
-                      <option key={l.inventory_item_id} value={l.inventory_item_id}>
-                        {l.label}
-                      </option>
+                    <option value="">Select an item…</option>
+                    {groups.map((g) => (
+                      <optgroup key={g} label={g}>
+                        {items
+                          .filter((i) => i.group === g)
+                          .map((l) => (
+                            <option key={l.inventory_item_id} value={l.inventory_item_id}>
+                              {l.label}
+                            </option>
+                          ))}
+                      </optgroup>
                     ))}
                   </NativeSelect>
                 </FormField>
@@ -194,7 +205,7 @@ export function AdjustmentForm({ lots, locations, defaultItemId }: Props) {
                 </FormField>
                 <FormField
                   name={`lines.${index}.quantity`}
-                  label="Quantity (g)"
+                  label={`Quantity (${selected?.unit ?? "base unit"})`}
                   error={lineErrors?.quantity?.message}
                   required
                 >
@@ -207,7 +218,7 @@ export function AdjustmentForm({ lots, locations, defaultItemId }: Props) {
                 </FormField>
                 <FormField
                   name={`lines.${index}.unit_cost`}
-                  label="Cost / g (₱)"
+                  label="Cost / unit (₱)"
                   error={lineErrors?.unit_cost?.message}
                   description="Increases only"
                 >

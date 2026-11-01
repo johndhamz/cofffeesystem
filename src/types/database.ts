@@ -149,6 +149,44 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"finished_goods_lots": {
+                  Row: {
+                    "best_before_at": string | null,"business_id": string,"created_at": string,"id": string,"lot_code": string,"packaged_at": string,"packaging_session_id": string | null,"quantity": number,"total_cost": number,"unit_cost": number,"updated_at": string,"variant_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "best_before_at"?: string | null,"business_id": string,"created_at"?: string,"id"?: string,"lot_code": string,"packaged_at": string,"packaging_session_id"?: string | null,"quantity": number,"total_cost": number,"unit_cost": number,"updated_at"?: string,"variant_id": string
+                  }
+                  Update: {
+                    "best_before_at"?: string | null,"business_id"?: string,"created_at"?: string,"id"?: string,"lot_code"?: string,"packaged_at"?: string,"packaging_session_id"?: string | null,"quantity"?: number,"total_cost"?: number,"unit_cost"?: number,"updated_at"?: string,"variant_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "finished_goods_lots_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "finished_goods_lots_packaging_session_id_business_id_fkey"
+      columns: ["packaging_session_id","business_id"]
+isOneToOne: false
+      referencedRelation: "packaging_session_summary_view"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "finished_goods_lots_packaging_session_id_business_id_fkey"
+      columns: ["packaging_session_id","business_id"]
+isOneToOne: false
+      referencedRelation: "packaging_sessions"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "finished_goods_lots_variant_id_business_id_fkey"
+      columns: ["variant_id","business_id"]
+isOneToOne: false
+      referencedRelation: "product_variants"
+      referencedColumns: ["id","business_id"]
+    }
+                  ]
                 },"goods_receipt_items": {
                   Row: {
                     "allocated_landed_cost": number,"business_id": string,"created_at": string,"green_lot_id": string,"id": string,"po_cost_share": number | null,"purchase_cost": number | null,"purchase_order_item_id": string,"receipt_id": string,"received_quantity_g": number,"total_cost": number | null
@@ -501,6 +539,242 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "inventory_locations"
       referencedColumns: ["id","business_id"]
+    }
+                  ]
+                },"packaging_inputs": {
+                  Row: {
+                    "business_id": string,"created_at": string,"id": string,"inherited_cost": number | null,"input_weight_g": number,"roast_batch_id": string,"session_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "business_id": string,"created_at"?: string,"id"?: string,"inherited_cost"?: number | null,"input_weight_g": number,"roast_batch_id": string,"session_id": string
+                  }
+                  Update: {
+                    "business_id"?: string,"created_at"?: string,"id"?: string,"inherited_cost"?: number | null,"input_weight_g"?: number,"roast_batch_id"?: string,"session_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "packaging_inputs_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "packaging_inputs_roast_batch_id_business_id_fkey"
+      columns: ["roast_batch_id","business_id"]
+isOneToOne: false
+      referencedRelation: "roast_batch_summary_view"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "packaging_inputs_roast_batch_id_business_id_fkey"
+      columns: ["roast_batch_id","business_id"]
+isOneToOne: false
+      referencedRelation: "roast_batches"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "packaging_inputs_session_id_business_id_fkey"
+      columns: ["session_id","business_id"]
+isOneToOne: false
+      referencedRelation: "packaging_session_summary_view"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "packaging_inputs_session_id_business_id_fkey"
+      columns: ["session_id","business_id"]
+isOneToOne: false
+      referencedRelation: "packaging_sessions"
+      referencedColumns: ["id","business_id"]
+    }
+                  ]
+                },"packaging_material_usage": {
+                  Row: {
+                    "business_id": string,"cost": number | null,"created_at": string,"id": string,"material_id": string,"quantity": number,"session_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "business_id": string,"cost"?: number | null,"created_at"?: string,"id"?: string,"material_id": string,"quantity": number,"session_id": string
+                  }
+                  Update: {
+                    "business_id"?: string,"cost"?: number | null,"created_at"?: string,"id"?: string,"material_id"?: string,"quantity"?: number,"session_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "packaging_material_usage_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "packaging_material_usage_material_id_business_id_fkey"
+      columns: ["material_id","business_id"]
+isOneToOne: false
+      referencedRelation: "packaging_material_inventory_view"
+      referencedColumns: ["material_id","business_id"]
+    },{
+      foreignKeyName: "packaging_material_usage_material_id_business_id_fkey"
+      columns: ["material_id","business_id"]
+isOneToOne: false
+      referencedRelation: "packaging_materials"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "packaging_material_usage_session_id_business_id_fkey"
+      columns: ["session_id","business_id"]
+isOneToOne: false
+      referencedRelation: "packaging_session_summary_view"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "packaging_material_usage_session_id_business_id_fkey"
+      columns: ["session_id","business_id"]
+isOneToOne: false
+      referencedRelation: "packaging_sessions"
+      referencedColumns: ["id","business_id"]
+    }
+                  ]
+                },"packaging_materials": {
+                  Row: {
+                    "base_unit": string,"business_id": string,"created_at": string,"id": string,"is_active": boolean,"name": string,"reorder_level": number,"sku": string | null,"standard_unit_cost": number,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "base_unit"?: string,"business_id": string,"created_at"?: string,"id"?: string,"is_active"?: boolean,"name": string,"reorder_level"?: number,"sku"?: string | null,"standard_unit_cost"?: number,"updated_at"?: string
+                  }
+                  Update: {
+                    "base_unit"?: string,"business_id"?: string,"created_at"?: string,"id"?: string,"is_active"?: boolean,"name"?: string,"reorder_level"?: number,"sku"?: string | null,"standard_unit_cost"?: number,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "packaging_materials_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"packaging_outputs": {
+                  Row: {
+                    "best_before_at": string | null,"business_id": string,"created_at": string,"finished_lot_id": string | null,"id": string,"lot_code": string | null,"quantity": number,"session_id": string,"total_cost": number | null,"unit_cost": number | null,"variant_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "best_before_at"?: string | null,"business_id": string,"created_at"?: string,"finished_lot_id"?: string | null,"id"?: string,"lot_code"?: string | null,"quantity": number,"session_id": string,"total_cost"?: number | null,"unit_cost"?: number | null,"variant_id": string
+                  }
+                  Update: {
+                    "best_before_at"?: string | null,"business_id"?: string,"created_at"?: string,"finished_lot_id"?: string | null,"id"?: string,"lot_code"?: string | null,"quantity"?: number,"session_id"?: string,"total_cost"?: number | null,"unit_cost"?: number | null,"variant_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "packaging_outputs_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "packaging_outputs_finished_lot_id_business_id_fkey"
+      columns: ["finished_lot_id","business_id"]
+isOneToOne: false
+      referencedRelation: "finished_goods_inventory_view"
+      referencedColumns: ["lot_id","business_id"]
+    },{
+      foreignKeyName: "packaging_outputs_finished_lot_id_business_id_fkey"
+      columns: ["finished_lot_id","business_id"]
+isOneToOne: false
+      referencedRelation: "finished_goods_lots"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "packaging_outputs_session_id_business_id_fkey"
+      columns: ["session_id","business_id"]
+isOneToOne: false
+      referencedRelation: "packaging_session_summary_view"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "packaging_outputs_session_id_business_id_fkey"
+      columns: ["session_id","business_id"]
+isOneToOne: false
+      referencedRelation: "packaging_sessions"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "packaging_outputs_variant_id_business_id_fkey"
+      columns: ["variant_id","business_id"]
+isOneToOne: false
+      referencedRelation: "product_variants"
+      referencedColumns: ["id","business_id"]
+    }
+                  ]
+                },"packaging_sessions": {
+                  Row: {
+                    "business_id": string,"coffee_cost": number | null,"completed_at": string | null,"created_at": string,"created_by": string | null,"id": string,"idempotency_key": string | null,"input_weight_g": number | null,"labor_cost": number,"location_id": string,"material_cost": number | null,"notes": string | null,"operator_id": string | null,"overhead_cost": number,"packaged_at": string,"required_weight_g": number | null,"session_number": string,"status": Database["public"]['Enums']["packaging_session_status"],"total_cost": number | null,"updated_at": string,"void_reason": string | null,"voided_at": string | null,"voided_by": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "business_id": string,"coffee_cost"?: number | null,"completed_at"?: string | null,"created_at"?: string,"created_by"?: string | null,"id"?: string,"idempotency_key"?: string | null,"input_weight_g"?: number | null,"labor_cost"?: number,"location_id": string,"material_cost"?: number | null,"notes"?: string | null,"operator_id"?: string | null,"overhead_cost"?: number,"packaged_at"?: string,"required_weight_g"?: number | null,"session_number": string,"status"?: Database["public"]['Enums']["packaging_session_status"],"total_cost"?: number | null,"updated_at"?: string,"void_reason"?: string | null,"voided_at"?: string | null,"voided_by"?: string | null
+                  }
+                  Update: {
+                    "business_id"?: string,"coffee_cost"?: number | null,"completed_at"?: string | null,"created_at"?: string,"created_by"?: string | null,"id"?: string,"idempotency_key"?: string | null,"input_weight_g"?: number | null,"labor_cost"?: number,"location_id"?: string,"material_cost"?: number | null,"notes"?: string | null,"operator_id"?: string | null,"overhead_cost"?: number,"packaged_at"?: string,"required_weight_g"?: number | null,"session_number"?: string,"status"?: Database["public"]['Enums']["packaging_session_status"],"total_cost"?: number | null,"updated_at"?: string,"void_reason"?: string | null,"voided_at"?: string | null,"voided_by"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "packaging_sessions_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "packaging_sessions_location_id_business_id_fkey"
+      columns: ["location_id","business_id"]
+isOneToOne: false
+      referencedRelation: "inventory_locations"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "packaging_sessions_operator_id_fkey"
+      columns: ["operator_id"]
+isOneToOne: false
+      referencedRelation: "user_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"product_variants": {
+                  Row: {
+                    "business_id": string,"created_at": string,"id": string,"is_active": boolean,"name": string,"net_weight_g": number,"packaging_type": string,"product_id": string,"selling_price": number,"sku": string,"updated_at": string,"wholesale_price": number | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "business_id": string,"created_at"?: string,"id"?: string,"is_active"?: boolean,"name": string,"net_weight_g": number,"packaging_type"?: string,"product_id": string,"selling_price"?: number,"sku": string,"updated_at"?: string,"wholesale_price"?: number | null
+                  }
+                  Update: {
+                    "business_id"?: string,"created_at"?: string,"id"?: string,"is_active"?: boolean,"name"?: string,"net_weight_g"?: number,"packaging_type"?: string,"product_id"?: string,"selling_price"?: number,"sku"?: string,"updated_at"?: string,"wholesale_price"?: number | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "product_variants_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "product_variants_product_id_business_id_fkey"
+      columns: ["product_id","business_id"]
+isOneToOne: false
+      referencedRelation: "products"
+      referencedColumns: ["id","business_id"]
+    }
+                  ]
+                },"products": {
+                  Row: {
+                    "business_id": string,"category": string | null,"created_at": string,"description": string | null,"id": string,"is_active": boolean,"name": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "business_id": string,"category"?: string | null,"created_at"?: string,"description"?: string | null,"id"?: string,"is_active"?: boolean,"name": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "business_id"?: string,"category"?: string | null,"created_at"?: string,"description"?: string | null,"id"?: string,"is_active"?: boolean,"name"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "products_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
     }
                   ]
                 },"purchase_order_items": {
@@ -891,10 +1165,74 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"variant_materials": {
+                  Row: {
+                    "business_id": string,"created_at": string,"id": string,"material_id": string,"quantity_per_unit": number,"variant_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "business_id": string,"created_at"?: string,"id"?: string,"material_id": string,"quantity_per_unit": number,"variant_id": string
+                  }
+                  Update: {
+                    "business_id"?: string,"created_at"?: string,"id"?: string,"material_id"?: string,"quantity_per_unit"?: number,"variant_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "variant_materials_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "variant_materials_material_id_business_id_fkey"
+      columns: ["material_id","business_id"]
+isOneToOne: false
+      referencedRelation: "packaging_material_inventory_view"
+      referencedColumns: ["material_id","business_id"]
+    },{
+      foreignKeyName: "variant_materials_material_id_business_id_fkey"
+      columns: ["material_id","business_id"]
+isOneToOne: false
+      referencedRelation: "packaging_materials"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "variant_materials_variant_id_business_id_fkey"
+      columns: ["variant_id","business_id"]
+isOneToOne: false
+      referencedRelation: "product_variants"
+      referencedColumns: ["id","business_id"]
+    }
+                  ]
                 }
           }
           Views: {
-            "green_lot_inventory_view": {
+            "finished_goods_inventory_view": {
+                  Row: {
+                    "available": number | null,"best_before_at": string | null,"business_id": string,"category": string | null,"coffee_names": string | null,"green_lot_codes": string | null,"inventory_item_id": string | null,"lot_code": string,"lot_id": string,"net_weight_g": number,"on_hand": number | null,"packaged_at": string,"packaged_quantity": number,"packaging_session_id": string | null,"product_id": string,"product_name": string,"reserved": number | null,"roast_batch_numbers": string | null,"selling_price": number,"session_number": string | null,"sku": string,"stock_status": string | null,"stock_value": number | null,"total_cost": number,"unit_cost": number,"variant_id": string,"variant_name": string,"wholesale_price": number | null
+                  }
+                  ComputedFields: never
+                  Relationships: [
+                    {
+      foreignKeyName: "finished_goods_lots_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "finished_goods_lots_packaging_session_id_business_id_fkey"
+      columns: ["packaging_session_id","business_id"]
+isOneToOne: false
+      referencedRelation: "packaging_session_summary_view"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "finished_goods_lots_packaging_session_id_business_id_fkey"
+      columns: ["packaging_session_id","business_id"]
+isOneToOne: false
+      referencedRelation: "packaging_sessions"
+      referencedColumns: ["id","business_id"]
+    }
+                  ]
+                },"green_lot_inventory_view": {
                   Row: {
                     "available_g": number | null,"business_id": string,"coffee_name": string,"cost_per_kg": number | null,"country": string | null,"density_g_per_100ml": number | null,"green_coffee_id": string,"inventory_item_id": string | null,"last_received_at": string | null,"lot_code": string,"lot_id": string,"low_stock_threshold": number | null,"low_stock_threshold_g": number | null,"moisture_pct": number | null,"on_hand_g": number | null,"processing_method": string | null,"received_at": string | null,"received_quantity_g": number | null,"region": string | null,"reserved_g": number | null,"stock_status": string | null,"stock_value": number | null,"supplier_id": string | null,"supplier_name": string | null,"total_received_cost": number | null
                   }
@@ -960,6 +1298,46 @@ isOneToOne: false
       referencedColumns: ["id","business_id"]
     }
                   ]
+                },"packaging_material_inventory_view": {
+                  Row: {
+                    "available": number | null,"base_unit": string,"business_id": string,"inventory_item_id": string | null,"is_active": boolean,"material_id": string,"name": string,"on_hand": number | null,"reorder_level": number,"reserved": number | null,"sku": string | null,"standard_unit_cost": number,"stock_status": string | null,"stock_value": number | null
+                  }
+                  ComputedFields: never
+                  Relationships: [
+                    {
+      foreignKeyName: "packaging_materials_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"packaging_session_summary_view": {
+                  Row: {
+                    "batch_numbers": string | null,"business_id": string,"coffee_cost": number | null,"completed_at": string | null,"created_at": string,"id": string,"input_weight_g": number | null,"labor_cost": number,"location_id": string,"location_name": string,"material_cost": number | null,"notes": string | null,"operator_id": string | null,"operator_name": string | null,"output_units": number | null,"overhead_cost": number,"packaged_at": string,"product_names": string | null,"required_weight_g": number | null,"session_number": string,"status": Database["public"]['Enums']["packaging_session_status"],"total_cost": number | null
+                  }
+                  ComputedFields: never
+                  Relationships: [
+                    {
+      foreignKeyName: "packaging_sessions_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "packaging_sessions_location_id_business_id_fkey"
+      columns: ["location_id","business_id"]
+isOneToOne: false
+      referencedRelation: "inventory_locations"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "packaging_sessions_operator_id_fkey"
+      columns: ["operator_id"]
+isOneToOne: false
+      referencedRelation: "user_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"roast_batch_summary_view": {
                   Row: {
                     "batch_number": string,"business_id": string,"coffee_names": string | null,"completed_at": string | null,"development_ratio_pct": number | null,"development_seconds": number | null,"first_crack_seconds": number | null,"green_cost": number | null,"green_weight_g": number,"id": string,"location_id": string,"location_name": string,"lot_codes": string | null,"lot_count": number | null,"operator_id": string | null,"operator_name": string | null,"production_cost_total": number | null,"profile_name": string | null,"roast_date": string,"roast_level": string | null,"roast_loss_pct": number | null,"roast_profile_id": string | null,"roast_yield_pct": number | null,"roasted_available_g": number | null,"roasted_cost_per_g": number | null,"roasted_cost_per_kg": number | null,"roasted_item_id": string | null,"roasted_on_hand_g": number | null,"roasted_reserved_g": number | null,"roasted_stock_value": number | null,"roasted_weight_g": number | null,"roaster_capacity_g": number,"roaster_id": string,"roaster_name": string,"started_at": string | null,"status": Database["public"]['Enums']["roast_batch_status"],"total_duration_seconds": number | null
@@ -1004,6 +1382,9 @@ isOneToOne: false
             "cancel_purchase_order":
 { Args: { "p_purchase_order_id": string }; Returns: undefined
                            },
+"complete_packaging_session":
+{ Args: { "p_session_id": string }; Returns: string
+                           },
 "complete_roast_batch":
 { Args: { "p_batch_id": string,"p_charge_bt_c": number,"p_charge_et_c": number,"p_costs": Json,"p_drop_bt_c": number,"p_first_crack_bt_c": number,"p_first_crack_seconds": number,"p_notes": string,"p_roast_level": string,"p_roasted_weight_g": number,"p_total_duration_seconds": number }; Returns: string
                            },
@@ -1018,6 +1399,9 @@ isOneToOne: false
                            },
 "create_inventory_adjustment":
 { Args: { "p_business_id": string,"p_idempotency_key": string,"p_lines": Json,"p_notes": string,"p_post"?: boolean,"p_reason": string }; Returns: string
+                           },
+"create_packaging_session":
+{ Args: { "p_business_id": string,"p_idempotency_key": string,"p_inputs": Json,"p_labor_cost": number,"p_location_id": string,"p_materials": Json,"p_notes": string,"p_operator_id": string,"p_outputs": Json,"p_overhead_cost": number,"p_packaged_at": string }; Returns: string
                            },
 "create_purchase_order":
 { Args: { "p_additional_costs": number,"p_business_id": string,"p_idempotency_key": string,"p_items": Json,"p_notes": string,"p_ordered_at": string,"p_supplier_id": string }; Returns: string
@@ -1048,18 +1432,24 @@ isOneToOne: false
 "start_roast_batch":
 { Args: { "p_batch_id": string }; Returns: undefined
                            },
+"update_packaging_session_draft":
+{ Args: { "p_inputs": Json,"p_labor_cost": number,"p_location_id": string,"p_materials": Json,"p_notes": string,"p_operator_id": string,"p_outputs": Json,"p_overhead_cost": number,"p_packaged_at": string,"p_session_id": string }; Returns: string
+                           },
 "update_purchase_order_draft":
 { Args: { "p_additional_costs": number,"p_items": Json,"p_notes": string,"p_ordered_at": string,"p_purchase_order_id": string,"p_supplier_id": string }; Returns: string
                            },
 "update_roast_batch_draft":
 { Args: { "p_batch_id": string,"p_inputs": Json,"p_location_id": string,"p_notes": string,"p_operator_id": string,"p_roast_date": string,"p_roast_profile_id": string,"p_roaster_id": string }; Returns: string
                            },
+"void_packaging_session":
+{ Args: { "p_idempotency_key": string,"p_reason": string,"p_session_id": string }; Returns: undefined
+                           },
 "void_roast_batch":
 { Args: { "p_batch_id": string,"p_idempotency_key": string,"p_reason": string }; Returns: undefined
                            }
           }
           Enums: {
-            "goods_receipt_status": "draft"|"posted"|"cancelled","inventory_adjustment_status": "draft"|"posted"|"reversed","inventory_item_type": "green_coffee_lot"|"roasted_bulk"|"finished_product"|"packaging_material","inventory_movement_type": "receipt"|"adjustment"|"adjustment_reversal"|"roast_consume"|"roast_output"|"pack_consume"|"pack_output"|"sale"|"sale_return"|"transfer_in"|"transfer_out"|"write_off"|"roast_void_restore"|"roast_void_consume","inventory_reservation_status": "active"|"released"|"consumed","member_role": "owner"|"roaster"|"inventory_staff"|"sales_staff"|"viewer","purchase_order_status": "draft"|"confirmed"|"partially_received"|"received"|"cancelled","roast_batch_status": "draft"|"in_progress"|"completed"|"voided","roast_event_type": "charge"|"turning_point"|"dry_end"|"first_crack_start"|"first_crack_end"|"second_crack_start"|"drop"|"cooling_end"|"gas_change"|"airflow_change"|"drum_change"|"note"
+            "goods_receipt_status": "draft"|"posted"|"cancelled","inventory_adjustment_status": "draft"|"posted"|"reversed","inventory_item_type": "green_coffee_lot"|"roasted_bulk"|"finished_product"|"packaging_material","inventory_movement_type": "receipt"|"adjustment"|"adjustment_reversal"|"roast_consume"|"roast_output"|"pack_consume"|"pack_output"|"sale"|"sale_return"|"transfer_in"|"transfer_out"|"write_off"|"roast_void_restore"|"roast_void_consume"|"pack_void_consume"|"pack_void_restore","inventory_reservation_status": "active"|"released"|"consumed","member_role": "owner"|"roaster"|"inventory_staff"|"sales_staff"|"viewer","packaging_session_status": "draft"|"completed"|"voided","purchase_order_status": "draft"|"confirmed"|"partially_received"|"received"|"cancelled","roast_batch_status": "draft"|"in_progress"|"completed"|"voided","roast_event_type": "charge"|"turning_point"|"dry_end"|"first_crack_start"|"first_crack_end"|"second_crack_start"|"drop"|"cooling_end"|"gas_change"|"airflow_change"|"drum_change"|"note"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -1175,7 +1565,7 @@ export type CompositeTypes<
 export const Constants = {
   "public": {
           Enums: {
-            "goods_receipt_status": ["draft", "posted", "cancelled"],"inventory_adjustment_status": ["draft", "posted", "reversed"],"inventory_item_type": ["green_coffee_lot", "roasted_bulk", "finished_product", "packaging_material"],"inventory_movement_type": ["receipt", "adjustment", "adjustment_reversal", "roast_consume", "roast_output", "pack_consume", "pack_output", "sale", "sale_return", "transfer_in", "transfer_out", "write_off", "roast_void_restore", "roast_void_consume"],"inventory_reservation_status": ["active", "released", "consumed"],"member_role": ["owner", "roaster", "inventory_staff", "sales_staff", "viewer"],"purchase_order_status": ["draft", "confirmed", "partially_received", "received", "cancelled"],"roast_batch_status": ["draft", "in_progress", "completed", "voided"],"roast_event_type": ["charge", "turning_point", "dry_end", "first_crack_start", "first_crack_end", "second_crack_start", "drop", "cooling_end", "gas_change", "airflow_change", "drum_change", "note"]
+            "goods_receipt_status": ["draft", "posted", "cancelled"],"inventory_adjustment_status": ["draft", "posted", "reversed"],"inventory_item_type": ["green_coffee_lot", "roasted_bulk", "finished_product", "packaging_material"],"inventory_movement_type": ["receipt", "adjustment", "adjustment_reversal", "roast_consume", "roast_output", "pack_consume", "pack_output", "sale", "sale_return", "transfer_in", "transfer_out", "write_off", "roast_void_restore", "roast_void_consume", "pack_void_consume", "pack_void_restore"],"inventory_reservation_status": ["active", "released", "consumed"],"member_role": ["owner", "roaster", "inventory_staff", "sales_staff", "viewer"],"packaging_session_status": ["draft", "completed", "voided"],"purchase_order_status": ["draft", "confirmed", "partially_received", "received", "cancelled"],"roast_batch_status": ["draft", "in_progress", "completed", "voided"],"roast_event_type": ["charge", "turning_point", "dry_end", "first_crack_start", "first_crack_end", "second_crack_start", "drop", "cooling_end", "gas_change", "airflow_change", "drum_change", "note"]
           }
         }
 } as const

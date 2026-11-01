@@ -180,6 +180,24 @@ export const roastProfileSchema = z.object({
   is_active: booleanFromForm.default(true),
 });
 
+export const packagingMaterialSchema = z.object({
+  name: requiredName(),
+  sku: optionalTrimmed(60),
+  base_unit: z.enum(["pc", "g", "ml"]),
+  reorder_level: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? 0 : typeof v === "string" ? Number(v) : v),
+    z.number().int("Use whole units").min(0, "Cannot be negative"),
+  ),
+  standard_unit_cost: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? "0" : v),
+    z
+      .string()
+      .trim()
+      .regex(/^\d{1,9}(\.\d{1,6})?$/, "Enter a cost with up to 6 decimals"),
+  ),
+  is_active: booleanFromForm.default(true),
+});
+
 export const MASTER_ENTITIES = {
   suppliers: defineEntity({
     key: "suppliers",
@@ -453,6 +471,63 @@ export const MASTER_ENTITIES = {
     ],
     searchColumns: ["name", "target_notes"],
     sortableColumns: ["name", "target_roast_level", "is_active", "created_at"],
+    defaultSort: "name",
+  }),
+  packaging_materials: defineEntity({
+    key: "packaging_materials",
+    table: "packaging_materials",
+    singular: "Packaging material",
+    plural: "Packaging materials",
+    description: "Bags, labels and boxes. Stock is received through inventory adjustments.",
+    basePath: "/packaging/materials",
+    managePermission: "packaging.manage",
+    readPermission: "packaging.read",
+    schema: packagingMaterialSchema,
+    fields: [
+      {
+        name: "name",
+        label: "Name",
+        type: "text",
+        required: true,
+        wide: true,
+        placeholder: "250 g kraft bag with valve",
+      },
+      { name: "sku", label: "SKU", type: "text" },
+      {
+        name: "base_unit",
+        label: "Unit",
+        type: "select",
+        required: true,
+        options: [
+          { value: "pc", label: "Piece" },
+          { value: "g", label: "Gram" },
+          { value: "ml", label: "Millilitre" },
+        ],
+      },
+      {
+        name: "reorder_level",
+        label: "Reorder level",
+        type: "number",
+        min: 0,
+        step: "1",
+        description: "Low-stock alert threshold",
+      },
+      {
+        name: "standard_unit_cost",
+        label: "Standard cost per unit (₱)",
+        type: "text",
+        description: "Used when no received cost is recorded",
+      },
+    ],
+    columns: [
+      { key: "name", label: "Name", sortable: true },
+      { key: "sku", label: "SKU", hideOnMobile: true },
+      { key: "base_unit", label: "Unit" },
+      { key: "reorder_level", label: "Reorder level", kind: "number", hideOnMobile: true },
+      { key: "is_active", label: "Status", kind: "badge", sortable: true },
+    ],
+    searchColumns: ["name", "sku"],
+    sortableColumns: ["name", "is_active", "created_at"],
     defaultSort: "name",
   }),
 };

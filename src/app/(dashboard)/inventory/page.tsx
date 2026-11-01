@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BoxesIcon, HistoryIcon, SlidersHorizontalIcon, TriangleAlertIcon } from "lucide-react";
+import {
+  BoxIcon,
+  BoxesIcon,
+  HistoryIcon,
+  PackageIcon,
+  SlidersHorizontalIcon,
+  TriangleAlertIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { PageHeader } from "@/components/shared/page-header";
@@ -34,6 +41,16 @@ export default async function InventoryPage({ searchParams }: PageProps<"/invent
         description="Green coffee lots, balances and valuation. Balances reconcile to the movement ledger."
         actions={
           <>
+            <Button asChild variant="outline" data-testid="finished-link">
+              <Link href="/inventory/finished">
+                <PackageIcon /> Finished goods
+              </Link>
+            </Button>
+            <Button asChild variant="outline" data-testid="materials-link">
+              <Link href="/inventory/materials">
+                <BoxIcon /> Materials
+              </Link>
+            </Button>
             <Button asChild variant="outline" data-testid="roasted-link">
               <Link href="/inventory/roasted">
                 <BoxesIcon /> Roasted bulk

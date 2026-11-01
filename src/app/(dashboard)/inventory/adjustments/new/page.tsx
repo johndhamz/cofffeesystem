@@ -29,18 +29,14 @@ export default async function NewAdjustmentPage({
           </Link>
         }
       />
-      {options.lots.length === 0 ? (
+      {options.items.length === 0 ? (
         <EmptyState
-          title="No lots to adjust"
-          description="Receive a purchase first to create green coffee lots."
+          title="No stock to adjust"
+          description="Receive a purchase or create packaging materials first."
         />
       ) : (
         <AdjustmentForm
-          lots={options.lots.map((l) => ({
-            inventory_item_id: l.inventory_item_id!,
-            label: `${l.coffee_name} · ${l.lot_code}`,
-            available_g: l.available_g ?? 0,
-          }))}
+          items={options.items}
           locations={options.locations.map((l) => ({ id: l.id, name: l.name }))}
           defaultItemId={item}
         />

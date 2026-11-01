@@ -14,13 +14,13 @@
 ## Placeholder content
 
 The following are intentionally placeholders with no business logic: the "production, sales and
-financial metrics" card on the dashboard and the Packaging, Products, Sales, Customers, Expenses
-and Reports pages. Inventory, purchasing and roasting numbers are live.
+financial metrics" card on the dashboard and the Sales, Customers, Expenses and Reports pages.
+Inventory, purchasing, roasting and packaging numbers are live.
 
 ## Ledger readiness for later phases
 
-Movement types `pack_consume`, `pack_output`, `sale`,
-`sale_return`, `transfer_*`, `write_off`, item types `finished_product` and `packaging_material`,
-and the reservation functions already exist so Phases 4–5 only add documents and call
-`app.post_movement()`. Roasted bulk stock (`roasted_bulk` items, one per completed roast batch)
-is the input for packaging; Artisan CSV parsing of uploaded attachments is deferred.
+Movement types `sale`, `sale_return`, `transfer_*`, `write_off` and the reservation functions
+already exist so Phase 5 only adds sales documents and calls `app.post_movement()` /
+`reserve_inventory()`. Finished-goods lots (`finished_product` items, one per packaging output
+line) are what sales fulfil; each carries its unit cost for COGS. Artisan CSV parsing of uploaded
+roast attachments is deferred.

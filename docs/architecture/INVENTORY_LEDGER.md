@@ -103,3 +103,26 @@ create_roast_batch (draft; inputs = green lots + weights)
   `max_gas_kpa`). Drafts only warn; completion enforces the policy.
 - Void of a completed batch posts `roast_void_consume` (−roasted) and `roast_void_restore` (+green
   with the original allocated cost as a new layer) and is refused if any roasted stock was consumed.
+
+## Packaging (Phase 4)
+
+```
+create_packaging_session (draft; inputs = roasted batches + grams, outputs = variant × qty, materials from BOM)
+→ complete_packaging_session:
+     per input batch:   post_movement(-input_g, 'pack_consume'); inherited_cost = consume_cost_layers(roasted item)
+     per material:      post_movement(-qty, 'pack_consume'); cost = consume_cost_layers(material item) or standard cost
+     total = Σ inherited + Σ material cost + labor + overhead
+     per output line:   finished_goods_lot (unit_cost = share / qty), finished_product item,
+                        post_movement(+qty, 'pack_output', share), add_cost_layer(qty, share)
+```
+
+- Cost is allocated to output lines by coffee weight (qty × net weight); the last line absorbs the
+  centavo remainder so Σ line costs == session total exactly (`allocateSessionCost` mirrors it).
+- Surplus input (Σ inputs > Σ required) is packing loss absorbed into the finished unit cost.
+- Lineage: finished lot → packaging session → `packaging_inputs` (roast batches) → `roast_batch_inputs`
+  (green lots). `finished_goods_inventory_view` exposes the batch numbers, green lot codes and coffee names.
+- Packaging materials get a ledger item on creation; stock is received with a positive adjustment
+  that records the unit cost, so material consumption is valued from real cost layers (falling back
+  to `standard_unit_cost` when none exist).
+- Void reverses finished goods, roasted coffee and materials with their original costs, only while
+  every finished lot is still fully on hand.

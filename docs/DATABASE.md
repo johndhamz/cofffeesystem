@@ -61,6 +61,7 @@ Functions raise errors prefixed `VALIDATION:`, `FORBIDDEN:`, `NOT_FOUND:`, `INVA
 - `inventory_movement_history_view` — movements joined with location, lot, coffee and actor.
 - `inventory_reconciliation_view` — balance vs ledger differences (should always be empty).
 - `roast_batch_summary_view` — batch with roaster, profile, operator, lots, yield metrics, cost/kg and roasted stock on hand.
+- `packaging_session_summary_view`, `finished_goods_inventory_view` (with roast batch / green lot lineage strings), `packaging_material_inventory_view` (stock status vs reorder level).
 
 ## Workflow
 

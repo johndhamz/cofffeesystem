@@ -64,7 +64,14 @@ export function EntityFormDialog({
   const defaults: FieldValues = {};
   for (const field of entity.fields) {
     const current = record?.[field.name];
-    defaults[field.name] = current === null || current === undefined ? "" : current;
+    if (current === null || current === undefined) {
+      // Required selects default to their first option so a native <select> never submits "".
+      const options = dynamicOptions?.[field.name] ?? field.options;
+      defaults[field.name] =
+        field.type === "select" && field.required ? (options?.[0]?.value ?? "") : "";
+    } else {
+      defaults[field.name] = current;
+    }
   }
   defaults.is_active = record ? Boolean(record.is_active) : true;
 
