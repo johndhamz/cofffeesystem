@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: 24
+  NEXT_PUBLIC_APP_URL: http://localhost:3000
+
+jobs:
+  static:
+    name: Lint, format & typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run format:check
+      - name: Typecheck
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:55821
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder-anon-key-not-a-secret
+        run: npx next typegen && npm run typecheck
+
+  unit:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npm test
+
+  database:
+    name: Migrations, integration & smoke tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - name: Start local Supabase (applies migrations + seed)
+        run: npx supabase start -x studio,realtime,storage-api,imgproxy,edge-runtime,logflare,vector,supavisor
+      - name: Write local env
+        run: npm run env:local
+      - name: Integration tests
+        run: npm run test:integration
+      - name: Verify migrations are in sync with the schema
+        run: npx supabase db diff --local --schema public,app | tee /tmp/diff.sql && test ! -s /tmp/diff.sql
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+      - name: Build
+        run: npm run build
+      - name: Assert no server secrets in client bundles
+        run: |
+          KEY=$(grep SUPABASE_SERVICE_ROLE_KEY .env.local | cut -d= -f2)
+          if grep -rq "$KEY" .next/static; then echo "Service role key leaked into client bundle"; exit 1; fi
+      - name: Playwright smoke tests
+        env:
+          CI: true
+        run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 7

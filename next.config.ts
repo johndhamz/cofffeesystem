@@ -1,9 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  cacheComponents: true,
-  partialPrefetching: true,
+  // The dashboard is fully dynamic (per-user, per-business data behind auth cookies).
+  // Cache Components are intentionally disabled in Phase 0; opt in per-route later if needed.
+  cacheComponents: false,
+  reactStrictMode: true,
+  agentRules: false,
+  poweredByHeader: false,
   turbopack: {
     rules: {
       "*.css": {
@@ -11,6 +14,19 @@ const nextConfig: NextConfig = {
         as: "*.css",
       },
     },
+  },
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+        ],
+      },
+    ];
   },
 };
 

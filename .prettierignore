@@ -1,0 +1,7 @@
+node_modules
+.next
+coverage
+playwright-report
+test-results
+supabase/.temp
+src/types/database.ts

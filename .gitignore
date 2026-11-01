@@ -39,3 +39,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# playwright
+/playwright-report/
+/test-results/
+/src/tests/e2e/.auth/
+
+# supabase local
+/supabase/.temp/
+/supabase/.branches/
+
+# allow example env
+!.env.example
