@@ -5,3 +5,4 @@ playwright-report
 test-results
 supabase/.temp
 src/types/database.ts
+src/app/shadcn-tailwind.css
