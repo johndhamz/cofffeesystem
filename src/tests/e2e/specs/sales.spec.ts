@@ -1,7 +1,7 @@
 import { test, expect, asRole } from "../fixtures/test";
 import { unique } from "../fixtures/users";
 
-test.describe("sales as owner", () => {
+test.describe("sales as owner", { tag: ["@sales", "@regression"] }, () => {
   asRole("owner");
   test.describe.configure({ mode: "serial" });
 
@@ -143,7 +143,7 @@ test.describe("sales as owner", () => {
   });
 });
 
-test.describe("sales as viewer", () => {
+test.describe("sales as viewer", { tag: ["@security", "@sales"] }, () => {
   asRole("viewer");
   test("viewer can see sales but cannot create orders", async ({ page }) => {
     await page.goto("/sales");

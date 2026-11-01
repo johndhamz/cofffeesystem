@@ -1,7 +1,7 @@
 import { test, expect, asRole } from "../fixtures/test";
 import { unique } from "../fixtures/users";
 
-test.describe("master data as owner", () => {
+test.describe("master data as owner", { tag: ["@smoke", "@regression"] }, () => {
   asRole("owner");
 
   test("owner creates a supplier and sees it in the list and detail view", async ({
@@ -141,7 +141,7 @@ test.describe("master data as owner", () => {
   });
 });
 
-test.describe("master data as viewer", () => {
+test.describe("master data as viewer", { tag: ["@security", "@regression"] }, () => {
   asRole("viewer");
 
   test("viewer cannot create or edit suppliers and cannot change settings", async ({

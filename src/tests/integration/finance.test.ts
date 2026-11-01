@@ -5,6 +5,7 @@ import {
   createConfirmedPurchase,
   createMasterFixtures,
   createReceipt,
+  fetchAll,
   lotsForReceipt,
   postReceipt,
   SEED,
@@ -504,13 +505,17 @@ describe("finance & reporting", () => {
     const { data: val } = await owner.rpc("report_inventory_valuation", {
       p_business_id: businessId,
     });
-    const { data: layers } = await owner
-      .from("inventory_cost_layers")
-      .select("remaining_cost")
-      .eq("business_id", businessId);
+    const layers = await fetchAll((f, t) =>
+      owner
+        .from("inventory_cost_layers")
+        .select("remaining_cost")
+        .eq("business_id", businessId)
+        .order("id")
+        .range(f, t),
+    );
     const total = (val ?? []).reduce((a, v) => a + v.value, 0);
     expect(Math.round(total * 100)).toBe(
-      Math.round((layers ?? []).reduce((a, l) => a + l.remaining_cost, 0) * 100),
+      Math.round(layers.reduce((a, l) => a + l.remaining_cost, 0) * 100),
     );
     const { data: ownerMetrics } = await owner.rpc("dashboard_metrics", {
       p_business_id: businessId,

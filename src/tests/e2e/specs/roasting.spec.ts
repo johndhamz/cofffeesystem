@@ -1,7 +1,7 @@
 import { test, expect, asRole } from "../fixtures/test";
 import { unique } from "../fixtures/users";
 
-test.describe("roast production as owner", () => {
+test.describe("roast production as owner", { tag: ["@production", "@regression"] }, () => {
   asRole("owner");
   test.describe.configure({ mode: "serial" });
 
@@ -94,7 +94,7 @@ test.describe("roast production as owner", () => {
   });
 });
 
-test.describe("roast production as viewer", () => {
+test.describe("roast production as viewer", { tag: ["@security", "@production"] }, () => {
   asRole("viewer");
   test("viewer can see roasts but cannot create them", async ({ page }) => {
     await page.goto("/roasting");

@@ -4,7 +4,7 @@ import type { Page } from "@playwright/test";
 export class MasterDataPage {
   constructor(private readonly page: Page) {}
 
-  readonly createButton = () => this.page.getByTestId("create-button");
+  readonly createButton = () => this.page.getByTestId("create-button").first();
   readonly dialog = () => this.page.locator('[data-testid$="-form-dialog"]');
   readonly submit = () => this.page.getByTestId("form-submit");
   readonly search = () => this.page.getByTestId("search-input");

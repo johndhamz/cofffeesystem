@@ -79,3 +79,14 @@ export function parseListQuery(
   const result = listQuerySchema.safeParse(flat);
   return result.success ? result.data : listQuerySchema.parse({});
 }
+
+/**
+ * Makes a user search term safe for PostgREST `ilike` filters inside `.or()` expressions:
+ * reserved syntax characters are dropped and LIKE wildcards are escaped.
+ */
+export function escapeLike(value: string): string {
+  return value
+    .replace(/[,()"'\\]/g, " ")
+    .replace(/[%_]/g, (m) => `\\${m}`)
+    .trim();
+}

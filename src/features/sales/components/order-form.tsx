@@ -40,7 +40,7 @@ const parse = (s: unknown) => {
   try {
     return toCentavos(String(s ?? "0") || "0");
   } catch {
-    return 0;
+    return -1; // invalid input → line ignored in the preview
   }
 };
 
@@ -73,23 +73,35 @@ export function OrderForm({ options, initial }: Props) {
   const w = useWatch({ control: form.control });
 
   const totals = useMemo(() => {
+    // Preview only: invalid or partial input (negative prices, blanks) is treated as zero here;
+    // the schema and the database reject it on submit.
     const lines = (w.items ?? [])
       .map((i) => {
         const q = Number(i.quantity);
-        return Number.isInteger(q) && q > 0
-          ? {
-              quantity: q,
-              unitPriceCentavos: parse(i.unit_price),
-              discountCentavos: Math.min(parse(i.discount_amount), q * parse(i.unit_price)),
-            }
-          : null;
+        const price = parse(i.unit_price);
+        const discount = parse(i.discount_amount);
+        if (!Number.isInteger(q) || q <= 0 || price < 0 || discount < 0) return null;
+        return {
+          quantity: q,
+          unitPriceCentavos: price,
+          discountCentavos: Math.min(discount, q * price),
+        };
       })
       .filter(Boolean) as {
       quantity: number;
       unitPriceCentavos: number;
       discountCentavos: number;
     }[];
-    return orderTotals(lines, parse(w.discount_amount));
+    try {
+      return orderTotals(lines, Math.max(0, parse(w.discount_amount)));
+    } catch {
+      return {
+        subtotalCentavos: 0,
+        lineDiscountCentavos: 0,
+        orderDiscountCentavos: 0,
+        totalCentavos: 0,
+      };
+    }
   }, [w]);
 
   function priceFor(variantId: string) {

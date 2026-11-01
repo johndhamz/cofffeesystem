@@ -1,7 +1,7 @@
 import { test, expect } from "../fixtures/test";
 import { TEST_USERS } from "../fixtures/users";
 
-test.describe("authentication", () => {
+test.describe("authentication", { tag: ["@smoke", "@security"] }, () => {
   test.use({ storageState: { cookies: [], origins: [] } });
 
   test("unauthenticated users are redirected to login from protected pages", async ({ page }) => {

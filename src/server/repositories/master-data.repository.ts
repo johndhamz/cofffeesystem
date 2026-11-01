@@ -3,6 +3,9 @@ import type { SupabaseServerClient } from "@/lib/supabase/server";
 import type { Database, Paginated } from "@/types";
 import type { ListQuery } from "@/lib/validation/common";
 import { fromDatabaseError } from "@/lib/errors";
+import { escapeLike } from "@/lib/validation/common";
+
+export { escapeLike };
 
 export const MASTER_TABLES = [
   "suppliers",
@@ -128,8 +131,4 @@ export function masterDataRepository<T extends MasterTable>(db: SupabaseServerCl
       if (error) throw fromDatabaseError(error);
     },
   };
-}
-
-export function escapeLike(value: string): string {
-  return value.replace(/[%_,()]/g, (m) => `\\${m}`);
 }
