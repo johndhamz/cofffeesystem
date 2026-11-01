@@ -11,11 +11,12 @@ if [ -z "$APP_URL" ]; then
 fi
 set -a; # shellcheck disable=SC1090
 source "$ENV_FILE"; set +a
-for KEY in NEXT_PUBLIC_SUPABASE_URL NEXT_PUBLIC_SUPABASE_ANON_KEY SUPABASE_SERVICE_ROLE_KEY; do
-  npx vercel env rm "$KEY" "$TARGET" --yes >/dev/null 2>&1 || true
-  printf '%s' "${!KEY}" | npx vercel env add "$KEY" "$TARGET" >/dev/null
-  echo "set $KEY ($TARGET)"
-done
-npx vercel env rm NEXT_PUBLIC_APP_URL "$TARGET" --yes >/dev/null 2>&1 || true
-printf '%s' "$APP_URL" | npx vercel env add NEXT_PUBLIC_APP_URL "$TARGET" >/dev/null
-echo "set NEXT_PUBLIC_APP_URL=$APP_URL ($TARGET)"
+# Public values stay readable (Config); the service-role key is stored as a Secret.
+add() { # name value sensitivity-flag
+  printf '%s' "$2" | npx vercel env add "$1" --environment "$TARGET" --force --yes "$3" >/dev/null
+  echo "set $1 ($TARGET)"
+}
+add NEXT_PUBLIC_SUPABASE_URL "$NEXT_PUBLIC_SUPABASE_URL" --no-sensitive
+add NEXT_PUBLIC_SUPABASE_ANON_KEY "$NEXT_PUBLIC_SUPABASE_ANON_KEY" --no-sensitive
+add SUPABASE_SERVICE_ROLE_KEY "$SUPABASE_SERVICE_ROLE_KEY" --sensitive
+add NEXT_PUBLIC_APP_URL "$APP_URL" --no-sensitive
