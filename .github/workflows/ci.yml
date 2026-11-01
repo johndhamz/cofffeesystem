@@ -56,7 +56,7 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Start local Supabase (applies migrations + seed)
-        run: npx supabase start -x studio,realtime,storage-api,imgproxy,edge-runtime,logflare,vector,supavisor
+        run: npx supabase start -x studio,realtime,edge-runtime,logflare,vector,supavisor
       - name: Write local env
         run: npm run env:local
       - name: Integration tests
