@@ -31,7 +31,9 @@ confirm → receive 10 kg → stock +10 kg, second lot with separate balance, au
 movement history, viewer cannot adjust, receive 10 kg → roast 1.5 kg → 1.26 kg out (16% loss, 84% yield,
 20% DTR) → green 8.5 kg and roasted 1.26 kg with cost/kg, immutability of completed batches, viewer
 cannot create roasts; 1260 g batch → five 250 g bags → 10 g roasted left, 5 units, 45 bags left,
-lineage to roast + green lot, unit cost ₱159.87.
+lineage to roast + green lot, unit cost ₱159.87; five bags → order 3 for a customer → confirm (reserved
+lots shown) → fulfil → 2 left, COGS snapshot → GCash payment → Paid + Completed → customer history,
+printable document, sales history.
 
 ## CI
 

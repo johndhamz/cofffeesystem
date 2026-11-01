@@ -77,7 +77,12 @@ const CLASSIFICATIONS = [
 ];
 
 const CHANNEL_TYPES = [
+  { value: "direct", label: "Direct" },
   { value: "walk_in", label: "Walk-in" },
+  { value: "facebook", label: "Facebook" },
+  { value: "instagram", label: "Instagram" },
+  { value: "shopee", label: "Shopee" },
+  { value: "lazada", label: "Lazada" },
   { value: "online", label: "Online" },
   { value: "wholesale", label: "Wholesale" },
   { value: "cafe", label: "Café" },
@@ -150,7 +155,20 @@ export const expenseCategorySchema = z.object({
 
 export const salesChannelSchema = z.object({
   name: requiredName(),
-  channel_type: z.enum(["walk_in", "online", "wholesale", "cafe", "consignment", "event", "other"]),
+  channel_type: z.enum([
+    "direct",
+    "walk_in",
+    "facebook",
+    "instagram",
+    "shopee",
+    "lazada",
+    "wholesale",
+    "online",
+    "cafe",
+    "consignment",
+    "event",
+    "other",
+  ]),
   is_active: booleanFromForm.default(true),
 });
 
@@ -195,6 +213,23 @@ export const packagingMaterialSchema = z.object({
       .trim()
       .regex(/^\d{1,9}(\.\d{1,6})?$/, "Enter a cost with up to 6 decimals"),
   ),
+  is_active: booleanFromForm.default(true),
+});
+
+export const customerSchema = z.object({
+  name: requiredName(),
+  customer_type: z.enum(["retail", "wholesale"]),
+  email: z.preprocess(
+    (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
+    z.email("Enter a valid email address").max(254).optional(),
+  ),
+  phone: optionalTrimmed(40),
+  address: optionalTrimmed(500),
+  payment_terms_days: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? 0 : typeof v === "string" ? Number(v) : v),
+    z.number().int("Use whole days").min(0, "Cannot be negative").max(365, "At most 365 days"),
+  ),
+  notes: optionalTrimmed(2000),
   is_active: booleanFromForm.default(true),
 });
 
@@ -528,6 +563,53 @@ export const MASTER_ENTITIES = {
     ],
     searchColumns: ["name", "sku"],
     sortableColumns: ["name", "is_active", "created_at"],
+    defaultSort: "name",
+  }),
+  customers: defineEntity({
+    key: "customers",
+    table: "customers",
+    singular: "Customer",
+    plural: "Customers",
+    description: "Retail and wholesale customers.",
+    basePath: "/customers",
+    managePermission: "customers.manage",
+    readPermission: "customers.read",
+    schema: customerSchema,
+    fields: [
+      { name: "name", label: "Name", type: "text", required: true, wide: true },
+      {
+        name: "customer_type",
+        label: "Type",
+        type: "select",
+        required: true,
+        options: [
+          { value: "retail", label: "Retail" },
+          { value: "wholesale", label: "Wholesale" },
+        ],
+      },
+      {
+        name: "payment_terms_days",
+        label: "Payment terms (days)",
+        type: "number",
+        min: 0,
+        max: 365,
+        step: "1",
+        description: "0 = pay on order",
+      },
+      { name: "email", label: "Email", type: "email" },
+      { name: "phone", label: "Phone", type: "tel" },
+      { name: "address", label: "Address", type: "textarea", wide: true },
+      { name: "notes", label: "Notes", type: "textarea", wide: true },
+    ],
+    columns: [
+      { key: "name", label: "Name", sortable: true },
+      { key: "customer_type", label: "Type", sortable: true },
+      { key: "phone", label: "Phone", hideOnMobile: true },
+      { key: "email", label: "Email", kind: "email", hideOnMobile: true },
+      { key: "is_active", label: "Status", kind: "badge", sortable: true },
+    ],
+    searchColumns: ["name", "email", "phone"],
+    sortableColumns: ["name", "customer_type", "is_active", "created_at"],
     defaultSort: "name",
   }),
 };

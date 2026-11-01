@@ -126,3 +126,23 @@ create_packaging_session (draft; inputs = roasted batches + grams, outputs = var
   to `standard_unit_cost` when none exist).
 - Void reverses finished goods, roasted coffee and materials with their original costs, only while
   every finished lot is still fully on hand.
+
+## Sales (Phase 5)
+
+```
+create_sales_order (draft) → confirm_sales_order: per line, reserve finished lots FIFO
+   (reserve_inventory raises reserved_quantity; sales_order_allocations records lot + qty)
+→ fulfill_sales_order (create + post in one transaction):
+     per line: release this order's reservation on the chosen lot, post_movement(-qty, 'sale'),
+               cost = consume_cost_layers(finished lot item) → unit_cost_snapshot, total_cost (COGS),
+               unit_price_snapshot (revenue)
+→ record_payment / issue_refund: never touch stock or revenue; payment_status is derived
+→ create_sales_return: inspected lines; only sealed + restock posts +qty 'sale_return' with the
+   original cost snapshot as a new cost layer; quarantine/waste never re-enter sellable stock
+```
+
+- Reservations make `available = on_hand − reserved`; `post_movement` refuses to let on-hand drop
+  below reserved, so a fulfilment can never consume stock held for another order.
+- Revenue is recognised on fulfilment (management reporting); payments are receipts against the
+  order balance; `amount_paid − amount_refunded` vs `total_amount` gives receivables.
+- Orders become `completed` automatically once fully fulfilled and fully paid.

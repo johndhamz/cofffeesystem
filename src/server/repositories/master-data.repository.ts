@@ -13,6 +13,7 @@ export const MASTER_TABLES = [
   "sales_channels",
   "roast_profiles",
   "packaging_materials",
+  "customers",
 ] as const;
 export type MasterTable = (typeof MASTER_TABLES)[number];
 

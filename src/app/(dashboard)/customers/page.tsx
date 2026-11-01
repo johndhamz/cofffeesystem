@@ -1,14 +1,8 @@
 import type { Metadata } from "next";
-import { PlaceholderPage } from "@/features/dashboard/placeholder-page";
+import { MasterDataPage } from "@/features/settings/master-data/master-data-page";
 
 export const metadata: Metadata = { title: "Customers" };
 
-export default function Page() {
-  return (
-    <PlaceholderPage
-      title="Customers"
-      phase="Phase 5"
-      description="Wholesale and retail customer records."
-    />
-  );
+export default async function CustomersPage({ searchParams }: PageProps<"/customers">) {
+  return <MasterDataPage entityKey="customers" searchParams={await searchParams} />;
 }

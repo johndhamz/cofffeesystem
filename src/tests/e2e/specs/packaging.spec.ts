@@ -121,6 +121,9 @@ test.describe("packaging as owner", () => {
     ).toHaveAttribute("data-units", "45");
 
     await page.goto("/inventory/finished");
+    await page.getByTestId("search-input").fill(fgLot);
+    await page.getByTestId("search-input").press("Enter");
+    await page.waitForURL((url) => url.searchParams.get("q") === fgLot);
     const row = page.getByTestId("data-row").filter({ hasText: fgLot }).first();
     await expect(row.getByTestId("available-units")).toHaveAttribute("data-units", "5");
     await expect(row).toContainText("159.87");

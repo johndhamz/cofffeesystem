@@ -62,6 +62,7 @@ Functions raise errors prefixed `VALIDATION:`, `FORBIDDEN:`, `NOT_FOUND:`, `INVA
 - `inventory_reconciliation_view` — balance vs ledger differences (should always be empty).
 - `roast_batch_summary_view` — batch with roaster, profile, operator, lots, yield metrics, cost/kg and roasted stock on hand.
 - `packaging_session_summary_view`, `finished_goods_inventory_view` (with roast batch / green lot lineage strings), `packaging_material_inventory_view` (stock status vs reorder level).
+- `sales_order_summary_view` (totals, outstanding, fulfilled/returned units, COGS), `customer_summary_view` (orders, revenue, outstanding), `variant_availability_view` (on hand / reserved / available per variant).
 
 ## Workflow
 

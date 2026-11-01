@@ -109,6 +109,26 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"customers": {
+                  Row: {
+                    "address": string | null,"business_id": string,"created_at": string,"customer_type": string,"email": string | null,"id": string,"is_active": boolean,"name": string,"notes": string | null,"payment_terms_days": number,"phone": string | null,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "address"?: string | null,"business_id": string,"created_at"?: string,"customer_type"?: string,"email"?: string | null,"id"?: string,"is_active"?: boolean,"name": string,"notes"?: string | null,"payment_terms_days"?: number,"phone"?: string | null,"updated_at"?: string
+                  }
+                  Update: {
+                    "address"?: string | null,"business_id"?: string,"created_at"?: string,"customer_type"?: string,"email"?: string | null,"id"?: string,"is_active"?: boolean,"name"?: string,"notes"?: string | null,"payment_terms_days"?: number,"phone"?: string | null,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "customers_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"document_sequences": {
                   Row: {
                     "business_id": string,"kind": string,"next_value": number,"period": string
@@ -185,6 +205,12 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "product_variants"
       referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "finished_goods_lots_variant_id_business_id_fkey"
+      columns: ["variant_id","business_id"]
+isOneToOne: false
+      referencedRelation: "variant_availability_view"
+      referencedColumns: ["variant_id","business_id"]
     }
                   ]
                 },"goods_receipt_items": {
@@ -697,6 +723,12 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "product_variants"
       referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "packaging_outputs_variant_id_business_id_fkey"
+      columns: ["variant_id","business_id"]
+isOneToOne: false
+      referencedRelation: "variant_availability_view"
+      referencedColumns: ["variant_id","business_id"]
     }
                   ]
                 },"packaging_sessions": {
@@ -729,6 +761,38 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "user_profiles"
       referencedColumns: ["id"]
+    }
+                  ]
+                },"payments": {
+                  Row: {
+                    "amount": number,"business_id": string,"created_at": string,"id": string,"idempotency_key": string,"notes": string | null,"order_id": string,"payment_method": Database["public"]['Enums']["payment_method"],"payment_reference": string | null,"received_at": string,"recorded_by": string | null,"status": string,"void_reason": string | null,"voided_at": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "amount": number,"business_id": string,"created_at"?: string,"id"?: string,"idempotency_key": string,"notes"?: string | null,"order_id": string,"payment_method": Database["public"]['Enums']["payment_method"],"payment_reference"?: string | null,"received_at"?: string,"recorded_by"?: string | null,"status"?: string,"void_reason"?: string | null,"voided_at"?: string | null
+                  }
+                  Update: {
+                    "amount"?: number,"business_id"?: string,"created_at"?: string,"id"?: string,"idempotency_key"?: string,"notes"?: string | null,"order_id"?: string,"payment_method"?: Database["public"]['Enums']["payment_method"],"payment_reference"?: string | null,"received_at"?: string,"recorded_by"?: string | null,"status"?: string,"void_reason"?: string | null,"voided_at"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "payments_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "payments_order_id_business_id_fkey"
+      columns: ["order_id","business_id"]
+isOneToOne: false
+      referencedRelation: "sales_order_summary_view"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "payments_order_id_business_id_fkey"
+      columns: ["order_id","business_id"]
+isOneToOne: false
+      referencedRelation: "sales_orders"
+      referencedColumns: ["id","business_id"]
     }
                   ]
                 },"product_variants": {
@@ -832,6 +896,44 @@ isOneToOne: false
       columns: ["supplier_id","business_id"]
 isOneToOne: false
       referencedRelation: "suppliers"
+      referencedColumns: ["id","business_id"]
+    }
+                  ]
+                },"refunds": {
+                  Row: {
+                    "amount": number,"business_id": string,"created_at": string,"created_by": string | null,"id": string,"idempotency_key": string,"order_id": string,"payment_id": string,"reason": string,"refund_method": Database["public"]['Enums']["payment_method"],"refunded_at": string,"status": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "amount": number,"business_id": string,"created_at"?: string,"created_by"?: string | null,"id"?: string,"idempotency_key": string,"order_id": string,"payment_id": string,"reason": string,"refund_method": Database["public"]['Enums']["payment_method"],"refunded_at"?: string,"status"?: string
+                  }
+                  Update: {
+                    "amount"?: number,"business_id"?: string,"created_at"?: string,"created_by"?: string | null,"id"?: string,"idempotency_key"?: string,"order_id"?: string,"payment_id"?: string,"reason"?: string,"refund_method"?: Database["public"]['Enums']["payment_method"],"refunded_at"?: string,"status"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "refunds_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "refunds_order_id_business_id_fkey"
+      columns: ["order_id","business_id"]
+isOneToOne: false
+      referencedRelation: "sales_order_summary_view"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "refunds_order_id_business_id_fkey"
+      columns: ["order_id","business_id"]
+isOneToOne: false
+      referencedRelation: "sales_orders"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "refunds_payment_id_business_id_fkey"
+      columns: ["payment_id","business_id"]
+isOneToOne: false
+      referencedRelation: "payments"
       referencedColumns: ["id","business_id"]
     }
                   ]
@@ -1131,6 +1233,290 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"sales_fulfillment_items": {
+                  Row: {
+                    "business_id": string,"created_at": string,"finished_goods_lot_id": string,"fulfillment_id": string,"id": string,"order_item_id": string,"quantity": number,"returned_quantity": number,"total_cost": number | null,"unit_cost_snapshot": number | null,"unit_price_snapshot": number | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "business_id": string,"created_at"?: string,"finished_goods_lot_id": string,"fulfillment_id": string,"id"?: string,"order_item_id": string,"quantity": number,"returned_quantity"?: number,"total_cost"?: number | null,"unit_cost_snapshot"?: number | null,"unit_price_snapshot"?: number | null
+                  }
+                  Update: {
+                    "business_id"?: string,"created_at"?: string,"finished_goods_lot_id"?: string,"fulfillment_id"?: string,"id"?: string,"order_item_id"?: string,"quantity"?: number,"returned_quantity"?: number,"total_cost"?: number | null,"unit_cost_snapshot"?: number | null,"unit_price_snapshot"?: number | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "sales_fulfillment_items_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "sales_fulfillment_items_finished_goods_lot_id_business_id_fkey"
+      columns: ["finished_goods_lot_id","business_id"]
+isOneToOne: false
+      referencedRelation: "finished_goods_inventory_view"
+      referencedColumns: ["lot_id","business_id"]
+    },{
+      foreignKeyName: "sales_fulfillment_items_finished_goods_lot_id_business_id_fkey"
+      columns: ["finished_goods_lot_id","business_id"]
+isOneToOne: false
+      referencedRelation: "finished_goods_lots"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "sales_fulfillment_items_fulfillment_id_business_id_fkey"
+      columns: ["fulfillment_id","business_id"]
+isOneToOne: false
+      referencedRelation: "sales_fulfillments"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "sales_fulfillment_items_order_item_id_business_id_fkey"
+      columns: ["order_item_id","business_id"]
+isOneToOne: false
+      referencedRelation: "sales_order_items"
+      referencedColumns: ["id","business_id"]
+    }
+                  ]
+                },"sales_fulfillments": {
+                  Row: {
+                    "business_id": string,"created_at": string,"created_by": string | null,"fulfilled_at": string,"fulfillment_number": string,"id": string,"idempotency_key": string | null,"location_id": string,"notes": string | null,"order_id": string,"posted_at": string | null,"posted_by": string | null,"status": Database["public"]['Enums']["sales_fulfillment_status"],"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "business_id": string,"created_at"?: string,"created_by"?: string | null,"fulfilled_at"?: string,"fulfillment_number": string,"id"?: string,"idempotency_key"?: string | null,"location_id": string,"notes"?: string | null,"order_id": string,"posted_at"?: string | null,"posted_by"?: string | null,"status"?: Database["public"]['Enums']["sales_fulfillment_status"],"updated_at"?: string
+                  }
+                  Update: {
+                    "business_id"?: string,"created_at"?: string,"created_by"?: string | null,"fulfilled_at"?: string,"fulfillment_number"?: string,"id"?: string,"idempotency_key"?: string | null,"location_id"?: string,"notes"?: string | null,"order_id"?: string,"posted_at"?: string | null,"posted_by"?: string | null,"status"?: Database["public"]['Enums']["sales_fulfillment_status"],"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "sales_fulfillments_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "sales_fulfillments_location_id_business_id_fkey"
+      columns: ["location_id","business_id"]
+isOneToOne: false
+      referencedRelation: "inventory_locations"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "sales_fulfillments_order_id_business_id_fkey"
+      columns: ["order_id","business_id"]
+isOneToOne: false
+      referencedRelation: "sales_order_summary_view"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "sales_fulfillments_order_id_business_id_fkey"
+      columns: ["order_id","business_id"]
+isOneToOne: false
+      referencedRelation: "sales_orders"
+      referencedColumns: ["id","business_id"]
+    }
+                  ]
+                },"sales_order_allocations": {
+                  Row: {
+                    "business_id": string,"created_at": string,"finished_goods_lot_id": string,"id": string,"location_id": string,"order_item_id": string,"quantity": number,"reservation_id": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "business_id": string,"created_at"?: string,"finished_goods_lot_id": string,"id"?: string,"location_id": string,"order_item_id": string,"quantity": number,"reservation_id"?: string | null
+                  }
+                  Update: {
+                    "business_id"?: string,"created_at"?: string,"finished_goods_lot_id"?: string,"id"?: string,"location_id"?: string,"order_item_id"?: string,"quantity"?: number,"reservation_id"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "sales_order_allocations_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "sales_order_allocations_finished_goods_lot_id_business_id_fkey"
+      columns: ["finished_goods_lot_id","business_id"]
+isOneToOne: false
+      referencedRelation: "finished_goods_inventory_view"
+      referencedColumns: ["lot_id","business_id"]
+    },{
+      foreignKeyName: "sales_order_allocations_finished_goods_lot_id_business_id_fkey"
+      columns: ["finished_goods_lot_id","business_id"]
+isOneToOne: false
+      referencedRelation: "finished_goods_lots"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "sales_order_allocations_location_id_business_id_fkey"
+      columns: ["location_id","business_id"]
+isOneToOne: false
+      referencedRelation: "inventory_locations"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "sales_order_allocations_order_item_id_business_id_fkey"
+      columns: ["order_item_id","business_id"]
+isOneToOne: false
+      referencedRelation: "sales_order_items"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "sales_order_allocations_reservation_id_fkey"
+      columns: ["reservation_id"]
+isOneToOne: false
+      referencedRelation: "inventory_reservations"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"sales_order_items": {
+                  Row: {
+                    "business_id": string,"created_at": string,"discount_amount": number,"fulfilled_quantity": number,"id": string,"line_total": number,"order_id": string,"product_variant_id": string,"quantity": number,"returned_quantity": number,"unit_price": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "business_id": string,"created_at"?: string,"discount_amount"?: number,"fulfilled_quantity"?: number,"id"?: string,"line_total": number,"order_id": string,"product_variant_id": string,"quantity": number,"returned_quantity"?: number,"unit_price": number
+                  }
+                  Update: {
+                    "business_id"?: string,"created_at"?: string,"discount_amount"?: number,"fulfilled_quantity"?: number,"id"?: string,"line_total"?: number,"order_id"?: string,"product_variant_id"?: string,"quantity"?: number,"returned_quantity"?: number,"unit_price"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "sales_order_items_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "sales_order_items_order_id_business_id_fkey"
+      columns: ["order_id","business_id"]
+isOneToOne: false
+      referencedRelation: "sales_order_summary_view"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "sales_order_items_order_id_business_id_fkey"
+      columns: ["order_id","business_id"]
+isOneToOne: false
+      referencedRelation: "sales_orders"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "sales_order_items_product_variant_id_business_id_fkey"
+      columns: ["product_variant_id","business_id"]
+isOneToOne: false
+      referencedRelation: "product_variants"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "sales_order_items_product_variant_id_business_id_fkey"
+      columns: ["product_variant_id","business_id"]
+isOneToOne: false
+      referencedRelation: "variant_availability_view"
+      referencedColumns: ["variant_id","business_id"]
+    }
+                  ]
+                },"sales_orders": {
+                  Row: {
+                    "amount_paid": number,"amount_refunded": number,"business_id": string,"cancel_reason": string | null,"cancelled_at": string | null,"completed_at": string | null,"confirmed_at": string | null,"created_at": string,"created_by": string | null,"customer_id": string | null,"discount_amount": number,"due_at": string | null,"id": string,"idempotency_key": string | null,"notes": string | null,"order_number": string,"ordered_at": string,"payment_status": Database["public"]['Enums']["payment_status"],"price_tier": string,"sales_channel_id": string,"status": Database["public"]['Enums']["sales_order_status"],"subtotal": number,"total_amount": number,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "amount_paid"?: number,"amount_refunded"?: number,"business_id": string,"cancel_reason"?: string | null,"cancelled_at"?: string | null,"completed_at"?: string | null,"confirmed_at"?: string | null,"created_at"?: string,"created_by"?: string | null,"customer_id"?: string | null,"discount_amount"?: number,"due_at"?: string | null,"id"?: string,"idempotency_key"?: string | null,"notes"?: string | null,"order_number": string,"ordered_at"?: string,"payment_status"?: Database["public"]['Enums']["payment_status"],"price_tier"?: string,"sales_channel_id": string,"status"?: Database["public"]['Enums']["sales_order_status"],"subtotal"?: number,"total_amount"?: number,"updated_at"?: string
+                  }
+                  Update: {
+                    "amount_paid"?: number,"amount_refunded"?: number,"business_id"?: string,"cancel_reason"?: string | null,"cancelled_at"?: string | null,"completed_at"?: string | null,"confirmed_at"?: string | null,"created_at"?: string,"created_by"?: string | null,"customer_id"?: string | null,"discount_amount"?: number,"due_at"?: string | null,"id"?: string,"idempotency_key"?: string | null,"notes"?: string | null,"order_number"?: string,"ordered_at"?: string,"payment_status"?: Database["public"]['Enums']["payment_status"],"price_tier"?: string,"sales_channel_id"?: string,"status"?: Database["public"]['Enums']["sales_order_status"],"subtotal"?: number,"total_amount"?: number,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "sales_orders_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "sales_orders_customer_id_business_id_fkey"
+      columns: ["customer_id","business_id"]
+isOneToOne: false
+      referencedRelation: "customer_summary_view"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "sales_orders_customer_id_business_id_fkey"
+      columns: ["customer_id","business_id"]
+isOneToOne: false
+      referencedRelation: "customers"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "sales_orders_sales_channel_id_business_id_fkey"
+      columns: ["sales_channel_id","business_id"]
+isOneToOne: false
+      referencedRelation: "sales_channels"
+      referencedColumns: ["id","business_id"]
+    }
+                  ]
+                },"sales_return_items": {
+                  Row: {
+                    "business_id": string,"condition": string,"created_at": string,"disposition": string,"fulfillment_item_id": string,"id": string,"quantity": number,"return_id": string,"unit_cost_snapshot": number | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "business_id": string,"condition": string,"created_at"?: string,"disposition": string,"fulfillment_item_id": string,"id"?: string,"quantity": number,"return_id": string,"unit_cost_snapshot"?: number | null
+                  }
+                  Update: {
+                    "business_id"?: string,"condition"?: string,"created_at"?: string,"disposition"?: string,"fulfillment_item_id"?: string,"id"?: string,"quantity"?: number,"return_id"?: string,"unit_cost_snapshot"?: number | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "sales_return_items_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "sales_return_items_fulfillment_item_id_business_id_fkey"
+      columns: ["fulfillment_item_id","business_id"]
+isOneToOne: false
+      referencedRelation: "sales_fulfillment_items"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "sales_return_items_return_id_business_id_fkey"
+      columns: ["return_id","business_id"]
+isOneToOne: false
+      referencedRelation: "sales_returns"
+      referencedColumns: ["id","business_id"]
+    }
+                  ]
+                },"sales_returns": {
+                  Row: {
+                    "business_id": string,"created_at": string,"created_by": string | null,"id": string,"idempotency_key": string | null,"location_id": string,"notes": string | null,"order_id": string,"posted_at": string | null,"posted_by": string | null,"reason": string,"received_at": string,"return_number": string,"status": Database["public"]['Enums']["sales_return_status"],"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "business_id": string,"created_at"?: string,"created_by"?: string | null,"id"?: string,"idempotency_key"?: string | null,"location_id": string,"notes"?: string | null,"order_id": string,"posted_at"?: string | null,"posted_by"?: string | null,"reason": string,"received_at"?: string,"return_number": string,"status"?: Database["public"]['Enums']["sales_return_status"],"updated_at"?: string
+                  }
+                  Update: {
+                    "business_id"?: string,"created_at"?: string,"created_by"?: string | null,"id"?: string,"idempotency_key"?: string | null,"location_id"?: string,"notes"?: string | null,"order_id"?: string,"posted_at"?: string | null,"posted_by"?: string | null,"reason"?: string,"received_at"?: string,"return_number"?: string,"status"?: Database["public"]['Enums']["sales_return_status"],"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "sales_returns_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "sales_returns_location_id_business_id_fkey"
+      columns: ["location_id","business_id"]
+isOneToOne: false
+      referencedRelation: "inventory_locations"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "sales_returns_order_id_business_id_fkey"
+      columns: ["order_id","business_id"]
+isOneToOne: false
+      referencedRelation: "sales_order_summary_view"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "sales_returns_order_id_business_id_fkey"
+      columns: ["order_id","business_id"]
+isOneToOne: false
+      referencedRelation: "sales_orders"
+      referencedColumns: ["id","business_id"]
+    }
+                  ]
                 },"suppliers": {
                   Row: {
                     "address": string | null,"business_id": string,"contact_person": string | null,"created_at": string,"email": string | null,"id": string,"is_active": boolean,"name": string,"notes": string | null,"phone": string | null,"updated_at": string
@@ -1201,12 +1587,32 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "product_variants"
       referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "variant_materials_variant_id_business_id_fkey"
+      columns: ["variant_id","business_id"]
+isOneToOne: false
+      referencedRelation: "variant_availability_view"
+      referencedColumns: ["variant_id","business_id"]
     }
                   ]
                 }
           }
           Views: {
-            "finished_goods_inventory_view": {
+            "customer_summary_view": {
+                  Row: {
+                    "address": string | null,"business_id": string,"created_at": string,"customer_type": string,"email": string | null,"id": string,"is_active": boolean,"last_order_at": string | null,"name": string,"notes": string | null,"orders": number | null,"outstanding": number | null,"payment_terms_days": number,"phone": string | null,"revenue": number | null,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Relationships: [
+                    {
+      foreignKeyName: "customers_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"finished_goods_inventory_view": {
                   Row: {
                     "available": number | null,"best_before_at": string | null,"business_id": string,"category": string | null,"coffee_names": string | null,"green_lot_codes": string | null,"inventory_item_id": string | null,"lot_code": string,"lot_id": string,"net_weight_g": number,"on_hand": number | null,"packaged_at": string,"packaged_quantity": number,"packaging_session_id": string | null,"product_id": string,"product_name": string,"reserved": number | null,"roast_batch_numbers": string | null,"selling_price": number,"session_number": string | null,"sku": string,"stock_status": string | null,"stock_value": number | null,"total_cost": number,"unit_cost": number,"variant_id": string,"variant_name": string,"wholesale_price": number | null
                   }
@@ -1376,11 +1782,60 @@ isOneToOne: false
       referencedColumns: ["id","business_id"]
     }
                   ]
+                },"sales_order_summary_view": {
+                  Row: {
+                    "amount_paid": number,"amount_refunded": number,"business_id": string,"cancelled_at": string | null,"channel_name": string,"channel_type": string,"completed_at": string | null,"confirmed_at": string | null,"created_at": string,"customer_id": string | null,"customer_name": string | null,"customer_type": string | null,"discount_amount": number,"due_at": string | null,"fulfilled_units": number | null,"id": string,"item_count": number | null,"notes": string | null,"order_number": string,"ordered_at": string,"ordered_units": number | null,"outstanding_amount": number | null,"payment_status": Database["public"]['Enums']["payment_status"],"price_tier": string,"product_names": string | null,"returned_units": number | null,"sales_channel_id": string,"status": Database["public"]['Enums']["sales_order_status"],"subtotal": number,"total_amount": number,"total_cogs": number | null
+                  }
+                  ComputedFields: never
+                  Relationships: [
+                    {
+      foreignKeyName: "sales_orders_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "sales_orders_customer_id_business_id_fkey"
+      columns: ["customer_id","business_id"]
+isOneToOne: false
+      referencedRelation: "customer_summary_view"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "sales_orders_customer_id_business_id_fkey"
+      columns: ["customer_id","business_id"]
+isOneToOne: false
+      referencedRelation: "customers"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "sales_orders_sales_channel_id_business_id_fkey"
+      columns: ["sales_channel_id","business_id"]
+isOneToOne: false
+      referencedRelation: "sales_channels"
+      referencedColumns: ["id","business_id"]
+    }
+                  ]
+                },"variant_availability_view": {
+                  Row: {
+                    "available": number | null,"business_id": string,"is_active": boolean,"net_weight_g": number,"on_hand": number | null,"product_name": string,"reserved": number | null,"selling_price": number,"sku": string,"variant_id": string,"variant_name": string,"wholesale_price": number | null
+                  }
+                  ComputedFields: never
+                  Relationships: [
+                    {
+      foreignKeyName: "product_variants_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    }
+                  ]
                 }
           }
           Functions: {
             "cancel_purchase_order":
 { Args: { "p_purchase_order_id": string }; Returns: undefined
+                           },
+"cancel_sales_order":
+{ Args: { "p_order_id": string,"p_reason": string }; Returns: undefined
                            },
 "complete_packaging_session":
 { Args: { "p_session_id": string }; Returns: string
@@ -1390,6 +1845,9 @@ isOneToOne: false
                            },
 "confirm_purchase_order":
 { Args: { "p_purchase_order_id": string }; Returns: undefined
+                           },
+"confirm_sales_order":
+{ Args: { "p_order_id": string,"p_reserve"?: boolean }; Returns: undefined
                            },
 "create_business_with_owner":
 { Args: { "p_name": string,"p_owner_user_id": string,"p_slug"?: string }; Returns: string
@@ -1409,6 +1867,18 @@ isOneToOne: false
 "create_roast_batch":
 { Args: { "p_business_id": string,"p_idempotency_key": string,"p_inputs": Json,"p_location_id": string,"p_notes": string,"p_operator_id": string,"p_roast_date": string,"p_roast_profile_id": string,"p_roaster_id": string }; Returns: string
                            },
+"create_sales_order":
+{ Args: { "p_business_id": string,"p_customer_id": string,"p_discount_amount": number,"p_due_at": string,"p_idempotency_key": string,"p_items": Json,"p_notes": string,"p_ordered_at": string,"p_price_tier": string,"p_sales_channel_id": string }; Returns: string
+                           },
+"create_sales_return":
+{ Args: { "p_idempotency_key": string,"p_items": Json,"p_location_id": string,"p_notes": string,"p_order_id": string,"p_reason": string,"p_received_at": string }; Returns: string
+                           },
+"fulfill_sales_order":
+{ Args: { "p_fulfilled_at": string,"p_idempotency_key": string,"p_items": Json,"p_location_id": string,"p_notes": string,"p_order_id": string }; Returns: string
+                           },
+"issue_refund":
+{ Args: { "p_amount": number,"p_idempotency_key": string,"p_method": string,"p_payment_id": string,"p_reason": string }; Returns: string
+                           },
 "my_memberships":
 { Args: Record<PropertyKey, never>; Returns: {
               "business_id": string,"business_name": string,"business_slug": string,"role": Database["public"]['Enums']["member_role"]
@@ -1419,6 +1889,9 @@ isOneToOne: false
                            },
 "post_inventory_adjustment":
 { Args: { "p_adjustment_id": string }; Returns: string
+                           },
+"record_payment":
+{ Args: { "p_amount": number,"p_idempotency_key": string,"p_method": string,"p_notes": string,"p_order_id": string,"p_received_at": string,"p_reference": string }; Returns: string
                            },
 "release_inventory_reservation":
 { Args: { "p_reservation_id": string }; Returns: undefined
@@ -1441,6 +1914,9 @@ isOneToOne: false
 "update_roast_batch_draft":
 { Args: { "p_batch_id": string,"p_inputs": Json,"p_location_id": string,"p_notes": string,"p_operator_id": string,"p_roast_date": string,"p_roast_profile_id": string,"p_roaster_id": string }; Returns: string
                            },
+"update_sales_order_draft":
+{ Args: { "p_customer_id": string,"p_discount_amount": number,"p_due_at": string,"p_items": Json,"p_notes": string,"p_order_id": string,"p_ordered_at": string,"p_price_tier": string,"p_sales_channel_id": string }; Returns: string
+                           },
 "void_packaging_session":
 { Args: { "p_idempotency_key": string,"p_reason": string,"p_session_id": string }; Returns: undefined
                            },
@@ -1449,7 +1925,7 @@ isOneToOne: false
                            }
           }
           Enums: {
-            "goods_receipt_status": "draft"|"posted"|"cancelled","inventory_adjustment_status": "draft"|"posted"|"reversed","inventory_item_type": "green_coffee_lot"|"roasted_bulk"|"finished_product"|"packaging_material","inventory_movement_type": "receipt"|"adjustment"|"adjustment_reversal"|"roast_consume"|"roast_output"|"pack_consume"|"pack_output"|"sale"|"sale_return"|"transfer_in"|"transfer_out"|"write_off"|"roast_void_restore"|"roast_void_consume"|"pack_void_consume"|"pack_void_restore","inventory_reservation_status": "active"|"released"|"consumed","member_role": "owner"|"roaster"|"inventory_staff"|"sales_staff"|"viewer","packaging_session_status": "draft"|"completed"|"voided","purchase_order_status": "draft"|"confirmed"|"partially_received"|"received"|"cancelled","roast_batch_status": "draft"|"in_progress"|"completed"|"voided","roast_event_type": "charge"|"turning_point"|"dry_end"|"first_crack_start"|"first_crack_end"|"second_crack_start"|"drop"|"cooling_end"|"gas_change"|"airflow_change"|"drum_change"|"note"
+            "goods_receipt_status": "draft"|"posted"|"cancelled","inventory_adjustment_status": "draft"|"posted"|"reversed","inventory_item_type": "green_coffee_lot"|"roasted_bulk"|"finished_product"|"packaging_material","inventory_movement_type": "receipt"|"adjustment"|"adjustment_reversal"|"roast_consume"|"roast_output"|"pack_consume"|"pack_output"|"sale"|"sale_return"|"transfer_in"|"transfer_out"|"write_off"|"roast_void_restore"|"roast_void_consume"|"pack_void_consume"|"pack_void_restore","inventory_reservation_status": "active"|"released"|"consumed","member_role": "owner"|"roaster"|"inventory_staff"|"sales_staff"|"viewer","packaging_session_status": "draft"|"completed"|"voided","payment_method": "cash"|"bank_transfer"|"gcash"|"maya"|"other","payment_status": "unpaid"|"partially_paid"|"paid"|"partially_refunded"|"refunded","purchase_order_status": "draft"|"confirmed"|"partially_received"|"received"|"cancelled","roast_batch_status": "draft"|"in_progress"|"completed"|"voided","roast_event_type": "charge"|"turning_point"|"dry_end"|"first_crack_start"|"first_crack_end"|"second_crack_start"|"drop"|"cooling_end"|"gas_change"|"airflow_change"|"drum_change"|"note","sales_fulfillment_status": "draft"|"posted"|"cancelled","sales_order_status": "draft"|"confirmed"|"reserved"|"partially_fulfilled"|"fulfilled"|"completed"|"cancelled"|"returned","sales_return_status": "draft"|"posted"|"cancelled"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -1565,7 +2041,7 @@ export type CompositeTypes<
 export const Constants = {
   "public": {
           Enums: {
-            "goods_receipt_status": ["draft", "posted", "cancelled"],"inventory_adjustment_status": ["draft", "posted", "reversed"],"inventory_item_type": ["green_coffee_lot", "roasted_bulk", "finished_product", "packaging_material"],"inventory_movement_type": ["receipt", "adjustment", "adjustment_reversal", "roast_consume", "roast_output", "pack_consume", "pack_output", "sale", "sale_return", "transfer_in", "transfer_out", "write_off", "roast_void_restore", "roast_void_consume", "pack_void_consume", "pack_void_restore"],"inventory_reservation_status": ["active", "released", "consumed"],"member_role": ["owner", "roaster", "inventory_staff", "sales_staff", "viewer"],"packaging_session_status": ["draft", "completed", "voided"],"purchase_order_status": ["draft", "confirmed", "partially_received", "received", "cancelled"],"roast_batch_status": ["draft", "in_progress", "completed", "voided"],"roast_event_type": ["charge", "turning_point", "dry_end", "first_crack_start", "first_crack_end", "second_crack_start", "drop", "cooling_end", "gas_change", "airflow_change", "drum_change", "note"]
+            "goods_receipt_status": ["draft", "posted", "cancelled"],"inventory_adjustment_status": ["draft", "posted", "reversed"],"inventory_item_type": ["green_coffee_lot", "roasted_bulk", "finished_product", "packaging_material"],"inventory_movement_type": ["receipt", "adjustment", "adjustment_reversal", "roast_consume", "roast_output", "pack_consume", "pack_output", "sale", "sale_return", "transfer_in", "transfer_out", "write_off", "roast_void_restore", "roast_void_consume", "pack_void_consume", "pack_void_restore"],"inventory_reservation_status": ["active", "released", "consumed"],"member_role": ["owner", "roaster", "inventory_staff", "sales_staff", "viewer"],"packaging_session_status": ["draft", "completed", "voided"],"payment_method": ["cash", "bank_transfer", "gcash", "maya", "other"],"payment_status": ["unpaid", "partially_paid", "paid", "partially_refunded", "refunded"],"purchase_order_status": ["draft", "confirmed", "partially_received", "received", "cancelled"],"roast_batch_status": ["draft", "in_progress", "completed", "voided"],"roast_event_type": ["charge", "turning_point", "dry_end", "first_crack_start", "first_crack_end", "second_crack_start", "drop", "cooling_end", "gas_change", "airflow_change", "drum_change", "note"],"sales_fulfillment_status": ["draft", "posted", "cancelled"],"sales_order_status": ["draft", "confirmed", "reserved", "partially_fulfilled", "fulfilled", "completed", "cancelled", "returned"],"sales_return_status": ["draft", "posted", "cancelled"]
           }
         }
 } as const
