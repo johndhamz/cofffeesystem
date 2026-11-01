@@ -11,6 +11,12 @@
   the token hash server-side and redirects to `/reset-password`. The request form always reports
   success so it cannot be used to enumerate accounts.
 - Logout is a server action that clears the session cookies.
+- **Multi-factor authentication (TOTP)**: any member can enrol an authenticator under
+  Settings → Security (`supabase.auth.mfa.enroll/challenge/verify` through server actions on the
+  user's own session). After enrolment, password sign-in only reaches `aal1`; the login action and
+  `src/proxy.ts` send the user to `/mfa` until a code is verified (`aal2`). Owners can set
+  `business_settings.require_mfa`; the dashboard layout then redirects members without a verified
+  factor to Settings → Security. Removing a factor requires an `aal2` session.
 
 ## Authorization
 
@@ -44,8 +50,16 @@ default settings (PHP, Asia/Manila, Yoshan DY-2kg, default location, expense cat
 channels), adds the user as `owner`, and prints a one-time password if none was given. The owner
 should change it via **Forgot password** on first login.
 
-Additional members are added by inserting into `business_members` (owners have `members.manage`;
-a members UI is planned). All changes are recorded in `audit_logs` with the acting user.
+Additional members are invited from Settings → Team members. `members.service.ts` uses the
+service-role client only to create/invite the auth user (`auth.admin.inviteUserByEmail`); the
+membership row is inserted as the owner, so RLS, the membership guard (last active owner, no
+reassignment) and the audit trigger apply. Invitation emails use token-hash links to
+`/auth/confirm` (templates in `supabase/templates/`; mirror them in the hosted dashboard). All
+changes are recorded in `audit_logs` with the acting user.
+
+**Lost authenticator (administrative process)**: with the service-role key, call
+`auth.admin.mfa.deleteFactor({ id, userId })` (or delete the row from `auth.mfa_factors` in the SQL
+editor) for that user only, then ask them to re-enrol. Never disable MFA for everyone.
 
 ## Hardening already in place
 
@@ -58,5 +72,5 @@ a members UI is planned). All changes are recorded in `audit_logs` with the acti
 ## Known gaps / follow-ups
 
 - No rate limiting beyond Supabase Auth's defaults.
-- No MFA. Supabase supports TOTP; enable when owners request it.
-- Member invitation UI and role changes are administrative (SQL/script) for now.
+- MFA has no recovery codes; recovery is the administrative process above.
+- No Content-Security-Policy header yet (Next.js inline scripts need nonces).

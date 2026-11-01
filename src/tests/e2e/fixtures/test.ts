@@ -8,6 +8,8 @@ import { InventoryPage } from "../pages/inventory.page";
 import { RoastingPage } from "../pages/roasting.page";
 import { PackagingPage } from "../pages/packaging.page";
 import { SalesPage } from "../pages/sales.page";
+import { MembersPage } from "../pages/members.page";
+import { SecurityPage } from "../pages/security.page";
 
 type Fixtures = {
   loginPage: LoginPage;
@@ -18,6 +20,8 @@ type Fixtures = {
   roasting: RoastingPage;
   packaging: PackagingPage;
   sales: SalesPage;
+  members: MembersPage;
+  security: SecurityPage;
 };
 
 // `use` here is Playwright's fixture callback, not the React hook.
@@ -30,6 +34,8 @@ export const test = base.extend<Fixtures>({
   roasting: async ({ page }, provide) => provide(new RoastingPage(page)),
   packaging: async ({ page }, provide) => provide(new PackagingPage(page)),
   sales: async ({ page }, provide) => provide(new SalesPage(page)),
+  members: async ({ page }, provide) => provide(new MembersPage(page)),
+  security: async ({ page }, provide) => provide(new SecurityPage(page)),
 });
 
 /** Use at the top of a describe block to run as a given role (session from global setup). */

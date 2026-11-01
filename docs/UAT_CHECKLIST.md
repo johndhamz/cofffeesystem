@@ -68,4 +68,13 @@ Perform on **staging** with real-looking data. Tester initials and date per line
 - [ ] Profitability: net sales − COGS = gross profit; − operating expenses = operating result.
 - [ ] Non-owner opening a financial report gets _Access denied_.
 
+## Team and security
+
+- [ ] Owner invites a teammate; the email arrives; the teammate sets a password and lands on the dashboard with the right role.
+- [ ] Changing a role takes effect on the teammate's next page load; deactivating sends them to "no business".
+- [ ] The owner cannot deactivate themselves or demote the only owner.
+- [ ] A member enrols an authenticator; the next sign-in asks for a code; a wrong code is rejected.
+- [ ] With _Require two-factor authentication_ on, a member without an authenticator is sent to Security until enrolled.
+- [ ] On a phone, _Add to Home Screen_ installs the app with the coffee icon; airplane mode shows the offline page.
+
 Sign-off: ______________________ (owner) Date: __________

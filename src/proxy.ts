@@ -7,6 +7,15 @@ const PUBLIC_PATHS = [
   "/reset-password",
   "/auth/callback",
   "/auth/confirm",
+  "/offline",
+];
+const MFA_EXEMPT = [
+  "/mfa",
+  "/reset-password",
+  "/auth/callback",
+  "/auth/confirm",
+  "/offline",
+  "/api/health",
 ];
 
 function isPublicPath(pathname: string) {
@@ -14,7 +23,7 @@ function isPublicPath(pathname: string) {
 }
 
 export async function proxy(request: NextRequest) {
-  const { response, user } = await updateSession(request);
+  const { response, user, needsMfaVerification } = await updateSession(request);
   const { pathname } = request.nextUrl;
 
   if (!user && !isPublicPath(pathname)) {
@@ -23,6 +32,25 @@ export async function proxy(request: NextRequest) {
     if (pathname !== "/") {
       url.searchParams.set("next", pathname);
     }
+    return NextResponse.redirect(url);
+  }
+
+  if (
+    user &&
+    needsMfaVerification &&
+    !MFA_EXEMPT.some((p) => pathname === p || pathname.startsWith(`${p}/`))
+  ) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/mfa";
+    url.search = "";
+    if (pathname !== "/" && pathname !== "/login") url.searchParams.set("next", pathname);
+    return NextResponse.redirect(url);
+  }
+
+  if (user && !needsMfaVerification && pathname === "/mfa") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/dashboard";
+    url.search = "";
     return NextResponse.redirect(url);
   }
 
@@ -39,6 +67,6 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     // Everything except Next internals, static assets and API health.
-    "/((?!_next/static|_next/image|favicon.ico|icons/|manifest.webmanifest|api/health|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|icons/|sw.js|manifest.webmanifest|offline|api/health|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };

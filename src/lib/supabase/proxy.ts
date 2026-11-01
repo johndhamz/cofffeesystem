@@ -6,6 +6,7 @@ import { NextResponse, type NextRequest } from "next/server";
  * Used by src/proxy.ts. Keep this lightweight: no data fetching.
  */
 export async function updateSession(request: NextRequest) {
+  request.headers.set("x-pathname", request.nextUrl.pathname);
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -32,5 +33,12 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  return { response, user };
+  // MFA step-up: an account with a verified factor must verify it in this session (aal2).
+  let needsMfaVerification = false;
+  if (user) {
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    needsMfaVerification = aal?.nextLevel === "aal2" && aal.currentLevel !== "aal2";
+  }
+
+  return { response, user, needsMfaVerification };
 }

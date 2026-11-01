@@ -102,11 +102,11 @@ begin
      or new.payment_status is distinct from old.payment_status or new.order_number is distinct from old.order_number
      or new.confirmed_at is distinct from old.confirmed_at or new.completed_at is distinct from old.completed_at
      or new.cancelled_at is distinct from old.cancelled_at or new.idempotency_key is distinct from old.idempotency_key then
-    raise exception 'INVALID_STATE: order % — status, totals and payments change only through sales functions', old.order_number using errcode = '55000';
+    raise exception 'INVALID_STATE: order % - status, totals and payments change only through sales functions', old.order_number using errcode = '55000';
   end if;
   if old.status <> 'draft' and (new.customer_id is distinct from old.customer_id or new.sales_channel_id is distinct from old.sales_channel_id
      or new.price_tier is distinct from old.price_tier or new.ordered_at is distinct from old.ordered_at) then
-    raise exception 'INVALID_STATE: order % is % — only notes and due date may change', old.order_number, old.status using errcode = '55000';
+    raise exception 'INVALID_STATE: order % is % - only notes and due date may change', old.order_number, old.status using errcode = '55000';
   end if;
   return new;
 end;
@@ -126,7 +126,7 @@ begin
      or new.roast_loss_pct is distinct from old.roast_loss_pct or new.roast_yield_pct is distinct from old.roast_yield_pct
      or new.batch_number is distinct from old.batch_number or new.completed_at is distinct from old.completed_at
      or new.voided_at is distinct from old.voided_at or new.idempotency_key is distinct from old.idempotency_key then
-    raise exception 'INVALID_STATE: roast batch % — status, weights and costs change only through roast functions (immutable)', old.batch_number using errcode = '55000';
+    raise exception 'INVALID_STATE: roast batch % - status, weights and costs change only through roast functions (immutable)', old.batch_number using errcode = '55000';
   end if;
   if old.status in ('completed', 'voided') and (new.roaster_id is distinct from old.roaster_id or new.location_id is distinct from old.location_id
      or new.roast_level is distinct from old.roast_level or new.total_duration_seconds is distinct from old.total_duration_seconds
@@ -149,7 +149,7 @@ begin
      or new.material_cost is distinct from old.material_cost or new.total_cost is distinct from old.total_cost
      or new.session_number is distinct from old.session_number or new.completed_at is distinct from old.completed_at
      or new.idempotency_key is distinct from old.idempotency_key then
-    raise exception 'INVALID_STATE: packaging session % — status, weights and costs change only through packaging functions (immutable)', old.session_number using errcode = '55000';
+    raise exception 'INVALID_STATE: packaging session % - status, weights and costs change only through packaging functions (immutable)', old.session_number using errcode = '55000';
   end if;
   if old.status in ('completed', 'voided') and (new.labor_cost is distinct from old.labor_cost or new.overhead_cost is distinct from old.overhead_cost
      or new.location_id is distinct from old.location_id or new.packaged_at is distinct from old.packaged_at) then

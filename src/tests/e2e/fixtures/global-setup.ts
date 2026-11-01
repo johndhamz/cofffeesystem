@@ -2,6 +2,7 @@ import { chromium, type FullConfig } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 import path from "node:path";
 import { TEST_USERS, authFile } from "./users";
+import { resetTestState } from "./users-admin";
 
 /**
  * Logs each test role in once through the real UI and stores its session cookies.
@@ -10,6 +11,7 @@ import { TEST_USERS, authFile } from "./users";
 export default async function globalSetup(config: FullConfig) {
   const baseURL = config.projects[0]?.use.baseURL ?? "http://localhost:3000";
   mkdirSync(path.resolve(__dirname, "../.auth"), { recursive: true });
+  await resetTestState();
   const browser = await chromium.launch();
   try {
     for (const [role, user] of Object.entries(TEST_USERS)) {

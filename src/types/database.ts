@@ -27,14 +27,14 @@ isOneToOne: false
                   ]
                 },"business_members": {
                   Row: {
-                    "business_id": string,"created_at": string,"id": string,"invited_by": string | null,"is_active": boolean,"role": Database["public"]['Enums']["member_role"],"updated_at": string,"user_id": string
+                    "accepted_at": string | null,"business_id": string,"created_at": string,"id": string,"invited_at": string | null,"invited_by": string | null,"is_active": boolean,"role": Database["public"]['Enums']["member_role"],"updated_at": string,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "business_id": string,"created_at"?: string,"id"?: string,"invited_by"?: string | null,"is_active"?: boolean,"role"?: Database["public"]['Enums']["member_role"],"updated_at"?: string,"user_id": string
+                    "accepted_at"?: string | null,"business_id": string,"created_at"?: string,"id"?: string,"invited_at"?: string | null,"invited_by"?: string | null,"is_active"?: boolean,"role"?: Database["public"]['Enums']["member_role"],"updated_at"?: string,"user_id": string
                   }
                   Update: {
-                    "business_id"?: string,"created_at"?: string,"id"?: string,"invited_by"?: string | null,"is_active"?: boolean,"role"?: Database["public"]['Enums']["member_role"],"updated_at"?: string,"user_id"?: string
+                    "accepted_at"?: string | null,"business_id"?: string,"created_at"?: string,"id"?: string,"invited_at"?: string | null,"invited_by"?: string | null,"is_active"?: boolean,"role"?: Database["public"]['Enums']["member_role"],"updated_at"?: string,"user_id"?: string
                   }
                   Relationships: [
                     {
@@ -59,14 +59,14 @@ isOneToOne: false
                   ]
                 },"business_settings": {
                   Row: {
-                    "business_id": string,"costing_method": string,"created_at": string,"currency": string,"default_location_id": string | null,"default_roaster_id": string | null,"id": string,"inventory_weight_unit": string,"timezone": string,"updated_at": string,"updated_by": string | null
+                    "business_id": string,"costing_method": string,"created_at": string,"currency": string,"default_location_id": string | null,"default_roaster_id": string | null,"id": string,"inventory_weight_unit": string,"require_mfa": boolean,"timezone": string,"updated_at": string,"updated_by": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "business_id": string,"costing_method"?: string,"created_at"?: string,"currency"?: string,"default_location_id"?: string | null,"default_roaster_id"?: string | null,"id"?: string,"inventory_weight_unit"?: string,"timezone"?: string,"updated_at"?: string,"updated_by"?: string | null
+                    "business_id": string,"costing_method"?: string,"created_at"?: string,"currency"?: string,"default_location_id"?: string | null,"default_roaster_id"?: string | null,"id"?: string,"inventory_weight_unit"?: string,"require_mfa"?: boolean,"timezone"?: string,"updated_at"?: string,"updated_by"?: string | null
                   }
                   Update: {
-                    "business_id"?: string,"costing_method"?: string,"created_at"?: string,"currency"?: string,"default_location_id"?: string | null,"default_roaster_id"?: string | null,"id"?: string,"inventory_weight_unit"?: string,"timezone"?: string,"updated_at"?: string,"updated_by"?: string | null
+                    "business_id"?: string,"costing_method"?: string,"created_at"?: string,"currency"?: string,"default_location_id"?: string | null,"default_roaster_id"?: string | null,"id"?: string,"inventory_weight_unit"?: string,"require_mfa"?: boolean,"timezone"?: string,"updated_at"?: string,"updated_by"?: string | null
                   }
                   Relationships: [
                     {
@@ -1668,7 +1668,33 @@ isOneToOne: false
                 }
           }
           Views: {
-            "customer_summary_view": {
+            "business_member_directory_view": {
+                  Row: {
+                    "accepted_at": string | null,"business_id": string,"created_at": string,"email": string,"full_name": string | null,"id": string,"invited_at": string | null,"invited_by": string | null,"invited_by_name": string | null,"is_active": boolean,"role": Database["public"]['Enums']["member_role"],"updated_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Relationships: [
+                    {
+      foreignKeyName: "business_members_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "business_members_invited_by_fkey"
+      columns: ["invited_by"]
+isOneToOne: false
+      referencedRelation: "user_profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "business_members_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "user_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"customer_summary_view": {
                   Row: {
                     "address": string | null,"business_id": string,"created_at": string,"customer_type": string,"email": string | null,"id": string,"is_active": boolean,"last_order_at": string | null,"name": string,"notes": string | null,"orders": number | null,"outstanding": number | null,"payment_terms_days": number,"phone": string | null,"revenue": number | null,"updated_at": string
                   }

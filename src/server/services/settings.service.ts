@@ -60,6 +60,7 @@ export async function updateBusinessSettings(input: unknown) {
     costing_method: values.costing_method,
     default_roaster_id: values.default_roaster_id ?? null,
     default_location_id: values.default_location_id ?? null,
+    require_mfa: values.require_mfa,
   });
 }
 

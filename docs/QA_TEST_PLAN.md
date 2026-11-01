@@ -6,10 +6,10 @@ Three automated layers plus manual UAT, all runnable locally and in CI:
 
 | Layer       | Tool                                               | Count (2026-11-01) | What it proves                                                                                                                                  |
 | ----------- | -------------------------------------------------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| Unit        | Vitest (jsdom)                                     | 75                 | money/weight/time arithmetic, Zod schemas, permission policy, error mapping, calculations for roast/packaging/sales/finance, display components |
-| Integration | Vitest (node) against local Supabase as real users | 102 (9 files)      | RLS, functions, idempotency, concurrency, reversals, costing, reporting reconciliation, global invariants, security                             |
-| End-to-end  | Playwright (Chromium, POM, tags)                   | 55 (10 specs)      | real UI flows per role, the full business scenario, negative paths, security headers/redirects                                                  |
-| Manual      | `docs/UAT_CHECKLIST.md`                            | 60 items           | business sign-off on staging                                                                                                                    |
+| Unit        | Vitest (jsdom)                                     | 76                 | money/weight/time arithmetic, Zod schemas, permission policy, error mapping, calculations for roast/packaging/sales/finance, display components |
+| Integration | Vitest (node) against local Supabase as real users | 103 (10 files)     | RLS, functions, idempotency, concurrency, reversals, costing, reporting reconciliation, global invariants, security                             |
+| End-to-end  | Playwright (Chromium, POM, tags)                   | 66 (13 specs)      | real UI flows per role, the full business scenario, negative paths, security headers/redirects, invitations by email, MFA sign-in, PWA assets   |
+| Manual      | `docs/UAT_CHECKLIST.md`                            | 66 items           | business sign-off on staging                                                                                                                    |
 
 Flakiness policy: **retries are disabled**. Every wait is state-based (`expect(...).toBe…`,
 `waitForURL`, `waitFor`); no `sleep`. Traces, screenshots and the HTML report are retained on
@@ -17,20 +17,23 @@ failure and uploaded by CI.
 
 ## Suites and tags (Playwright)
 
-| Tag           | Scope                                                          | Command                       |
-| ------------- | -------------------------------------------------------------- | ----------------------------- |
-| `@smoke`      | login/logout/redirects, master data, purchase→receive, headers | `npm run test:e2e:smoke`      |
-| `@regression` | every functional flow                                          | `npm run test:e2e:regression` |
-| `@inventory`  | receiving, lots, adjustments, movements, the business flow     | `npm run test:e2e:inventory`  |
-| `@production` | roasting                                                       | `npm run test:e2e:production` |
-| `@packaging`  | products, materials, sessions                                  | `npm run test:e2e:packaging`  |
-| `@sales`      | customers, orders, fulfilment, payments, returns               | `npm run test:e2e:sales`      |
-| `@finance`    | dashboard, expenses, reports, exports                          | `npm run test:e2e:finance`    |
-| `@security`   | role boundaries, headers, sessions, injection, negative paths  | `npm run test:e2e:security`   |
+| Tag           | Scope                                                                            | Command                       |
+| ------------- | -------------------------------------------------------------------------------- | ----------------------------- |
+| `@smoke`      | login/logout/redirects, master data, purchase→receive, headers                   | `npm run test:e2e:smoke`      |
+| `@regression` | every functional flow                                                            | `npm run test:e2e:regression` |
+| `@inventory`  | receiving, lots, adjustments, movements, the business flow                       | `npm run test:e2e:inventory`  |
+| `@production` | roasting                                                                         | `npm run test:e2e:production` |
+| `@packaging`  | products, materials, sessions                                                    | `npm run test:e2e:packaging`  |
+| `@sales`      | customers, orders, fulfilment, payments, returns                                 | `npm run test:e2e:sales`      |
+| `@finance`    | dashboard, expenses, reports, exports                                            | `npm run test:e2e:finance`    |
+| `@security`   | role boundaries, headers, sessions, injection, negative paths, team members, MFA | `npm run test:e2e:security`   |
 
 Fixtures: `fixtures/test.ts` (page objects as fixtures, `asRole()`), `fixtures/global-setup.ts`
 (logs each role in once through the UI, stores sessions), `fixtures/api.ts` (API-based setup
-through the same Postgres functions as the app, as the owner). Test data is uniquely named per run;
+through the same Postgres functions as the app, as the owner), `fixtures/users-admin.ts`
+(service-role creation/removal of throwaway accounts for the MFA and invitation specs, plus a
+reset of the MFA policy in global setup), `fixtures/mailpit.ts` (reads invitation links from the
+local Mailpit API). TOTP codes are generated with `otpauth`. Test data is uniquely named per run;
 suites never reset the database and can run repeatedly.
 
 ## Inventory invariants (STEP 2)

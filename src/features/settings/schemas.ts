@@ -12,6 +12,9 @@ export const businessSettingsSchema = z.object({
   costing_method: z.enum(["lot_actual", "fifo", "weighted_average"]),
   default_roaster_id: optionalUuid,
   default_location_id: optionalUuid,
+  require_mfa: z
+    .preprocess((v) => v === true || v === "true" || v === "on", z.boolean())
+    .default(false),
 });
 export type BusinessSettingsInput = z.output<typeof businessSettingsSchema>;
 export type BusinessSettingsFormValues = z.input<typeof businessSettingsSchema>;

@@ -14,6 +14,8 @@
   order and repeatedly without a reset. `fileParallelism` is off because they share one database.
 - Concurrency tests fire parallel RPC calls (8 posts of one receipt; 10 adjustments draining one
   lot) and assert exactly one movement / no negative stock.
+- `members.test.ts` creates throwaway auth users with the service role (deleted afterwards) to
+  prove the membership guard, the sign-in trigger and real TOTP enrolment (`otpauth` codes).
 
 ## Playwright
 

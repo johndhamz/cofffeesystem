@@ -30,6 +30,26 @@ hosted Micro instance allows 60 direct / 200 pooled). Reconciliation differences
 The two concurrency rows are a single timed `Promise.all` (n = 1) and prove correctness under
 contention more than latency; all calls succeeded and serialised on the balance row locks.
 
+## Re-run after Phase 7 (2026-11-01, fresh `db reset` + 5,000 generated movements)
+
+Phase 7 adds no inventory or reporting queries; the proxy now also decodes the session's assurance
+level on every request (local JWT work, no network call). Results stayed within budget:
+
+| Metric                                                           | Budget (p95) | p50    | p95    | max    | n   | Result |
+| ---------------------------------------------------------------- | ------------ | ------ | ------ | ------ | --- | ------ |
+| dashboard_metrics (RPC, full year)                               | 800 ms       | 88 ms  | 105 ms | 105 ms | 20  | PASS   |
+| green_lot_inventory_view page (25 rows)                          | 400 ms       | 130 ms | 168 ms | 168 ms | 20  | PASS   |
+| inventory_movement_history_view page (50 rows)                   | 400 ms       | 90 ms  | 116 ms | 116 ms | 20  | PASS   |
+| movement history for one item with 5,000+ rows (page 1)          | 400 ms       | 79 ms  | 138 ms | 138 ms | 20  | PASS   |
+| inventory_reconciliation_view (all balances)                     | 800 ms       | 80 ms  | 86 ms  | 86 ms  | 10  | PASS   |
+| report_profitability (year)                                      | 800 ms       | 24 ms  | 33 ms  | 33 ms  | 10  | PASS   |
+| report_sales_lines_view export page (200 rows)                   | 1000 ms      | 49 ms  | 65 ms  | 65 ms  | 10  | PASS   |
+| report_monthly_sales + by_dimension(product) + weekly_production | 1200 ms      | 31 ms  | 40 ms  | 40 ms  | 10  | PASS   |
+| 5 concurrent roast completions (same green lot)                  | 1500 ms      | 27 ms  | 27 ms  | 27 ms  | 1   | PASS   |
+| 10 concurrent order fulfilments (30 bags across 5 lots)          | 2000 ms      | 52 ms  | 52 ms  | 52 ms  | 1   | PASS   |
+
+Connections during the run: 19 total / 1 active (max 100). Reconciliation differences: 0.
+
 ## Budgets rationale
 
 - Interactive pages (dashboard, inventory, lists): p95 ≤ 400–800 ms server time keeps total page

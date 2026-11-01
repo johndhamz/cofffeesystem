@@ -5,8 +5,9 @@ packaging, selling, and knowing what everything cost. Everything is in grams and
 
 ## Signing in
 
-Your owner creates your account and tells you the email. On the sign-in page use **Forgot your
-password?** the first time to set your own password. Roles decide what you can do:
+Your owner invites you by email. Open the link in the invitation, choose a password, and you are
+in. If the link expired, use **Forgot your password?** on the sign-in page. Roles decide what you
+can do:
 
 | Role            | Can do                                                                   |
 | --------------- | ------------------------------------------------------------------------ |
@@ -22,9 +23,26 @@ password?** the first time to set your own password. Roles decide what you can d
 Stock only changes when you _post_ a document: receiving, completing a roast, completing a
 packaging session, fulfilling an order, posting an adjustment or a return. Drafts never move stock.
 
+## Team members and security
+
+**Settings → Team members** (owner): invite a teammate by email and role, resend an invitation,
+change a role, or deactivate someone who left (their history stays). A business always keeps at
+least one active owner.
+
+**Settings → Security** (everyone): enable two-factor authentication. Scan the QR code with Google
+Authenticator, Authy or 1Password, type the 6-digit code once, and from then on sign-in asks for a
+code after your password. Owners can make this mandatory for everyone in Settings → Business
+(_Require two-factor authentication_); members without an authenticator are sent to Security until
+they enrol. Lost your phone? Ask an owner to remove the authenticator.
+
+**Add to home screen**: on a phone or tablet, open the app in Chrome/Safari and choose _Add to Home
+Screen_ / _Install_. It opens full-screen like an app. If the connection drops you will see an
+offline page; nothing is saved offline, so reconnect and try again.
+
 ## Settings (owner)
 
-Settings → Business: name, default roaster and default location. Settings → Suppliers / Roasters /
+Settings → Business: name, default roaster and default location, and whether two-factor
+authentication is required. Settings → Suppliers / Roasters /
 Locations / Expense categories / Sales channels, and Green Coffee for the coffee catalog. Deactivate
 records instead of deleting them; history is kept.
 

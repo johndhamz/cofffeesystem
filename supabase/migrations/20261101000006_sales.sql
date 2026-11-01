@@ -1,5 +1,5 @@
 -- =============================================================================
--- Phase 5: Sales — customers, orders, reservations, fulfillment, payments,
+-- Phase 5: Sales - customers, orders, reservations, fulfillment, payments,
 -- refunds, returns. Stock moves only when a fulfillment is posted; payments
 -- are tracked independently of order status.
 -- =============================================================================
@@ -282,7 +282,7 @@ begin
     or new.amount_paid is distinct from old.amount_paid or new.amount_refunded is distinct from old.amount_refunded
     or new.payment_status is distinct from old.payment_status or new.customer_id is distinct from old.customer_id
     or new.sales_channel_id is distinct from old.sales_channel_id) then
-    raise exception 'INVALID_STATE: order % is % — status, totals and payments change only through sales functions', old.order_number, old.status using errcode = '55000';
+    raise exception 'INVALID_STATE: order % is % - status, totals and payments change only through sales functions', old.order_number, old.status using errcode = '55000';
   end if;
   return new;
 end;

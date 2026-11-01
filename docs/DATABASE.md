@@ -6,11 +6,17 @@ production).
 
 ## Migrations
 
-| File                                       | Contents                                                                                                                                                                                             |
-| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `20261031000001_foundation.sql`            | `businesses`, `user_profiles`, `business_members`, `business_settings`, `audit_logs`, `role_permissions`, RLS helpers, audit/updated_at triggers, `create_business_with_owner()`, `my_memberships()` |
-| `20261031000002_master_data.sql`           | `suppliers`, `green_coffees`, `roasters`, `inventory_locations`, `expense_categories`, `sales_channels`, `document_sequences`, settings defaults, `seed_business_defaults()`                         |
-| `20261031000003_procurement_inventory.sql` | Purchase orders, goods receipts, green lots, the inventory ledger, adjustments, reservations, posting functions, views                                                                               |
+| File                                       | Contents                                                                                                                                                                                                                                            |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `20261031000001_foundation.sql`            | `businesses`, `user_profiles`, `business_members`, `business_settings`, `audit_logs`, `role_permissions`, RLS helpers, audit/updated_at triggers, `create_business_with_owner()`, `my_memberships()`                                                |
+| `20261031000002_master_data.sql`           | `suppliers`, `green_coffees`, `roasters`, `inventory_locations`, `expense_categories`, `sales_channels`, `document_sequences`, settings defaults, `seed_business_defaults()`                                                                        |
+| `20261031000003_procurement_inventory.sql` | Purchase orders, goods receipts, green lots, the inventory ledger, adjustments, reservations, posting functions, views                                                                                                                              |
+| `20261101000004_roasting.sql`              | Roast profiles, batches, inputs, measurements, events, costs, attachments (bucket `roast-attachments`), `create/update/start/complete/void_roast_batch`, `roast_batch_summary_view`                                                                 |
+| `20261101000005_packaging.sql`             | Products, variants, packaging materials (+ inventory item trigger), variant BOM, packaging sessions, finished goods lots, `create/update/complete/void_packaging_session`, views                                                                    |
+| `20261101000006_sales.sql`                 | Customers, sales orders/items, allocations, fulfilments, payments, refunds, returns, `create/update/confirm/cancel_sales_order`, `fulfill_sales_order`, `record_payment`, `issue_refund`, `create_sales_return`, views                              |
+| `20261101000007_finance.sql`               | Expenses, cost allocations, `finance.read`/`expenses.allocate` permissions, report views and functions, `dashboard_metrics`, bucket `expense-receipts`                                                                                              |
+| `20261101000008_hardening.sql`             | Security review fixes: column guards on documents/snapshots, immutable `audit_logs`, reservation permissions, `app.require_any_permission`                                                                                                          |
+| `20261101000009_members_mfa.sql`           | `business_members.invited_at/accepted_at`, `business_settings.require_mfa`, membership guard (no business/user reassignment, last active owner protected), `auth.users` sign-in trigger that stamps `accepted_at`, `business_member_directory_view` |
 
 ## Conventions
 
@@ -37,26 +43,28 @@ Ledger tables (`inventory_*`) have **select-only** policies; mutations go throug
 
 ## Functions (RPC)
 
-| Function                                              | Permission        | Notes                                          |
-| ----------------------------------------------------- | ----------------- | ---------------------------------------------- |
-| `create_purchase_order`                               | purchases.manage  | idempotent on key; numbers `PO-YYYY-0001`      |
-| `update_purchase_order_draft`                         | purchases.manage  | draft only                                     |
-| `confirm_purchase_order`                              | purchases.manage  | idempotent                                     |
-| `cancel_purchase_order`                               | purchases.manage  | not after posted receipts                      |
-| `create_goods_receipt`                                | purchases.post    | creates lots; validates landed-cost allocation |
-| `post_goods_receipt`                                  | purchases.post    | the only path that increases green stock       |
-| `create_inventory_adjustment`                         | inventory.adjust  | create + post atomically; idempotent           |
-| `post_inventory_adjustment`                           | inventory.adjust  |                                                |
-| `reverse_inventory_adjustment`                        | inventory.adjust  | posts opposite movements                       |
-| `reserve_inventory` / `release_inventory_reservation` | inventory.read    | for later phases                               |
-| `create_business_with_owner`                          | service role only | provisioning                                   |
-| `my_memberships`                                      | authenticated     | current user's businesses                      |
+| Function                                              | Permission        | Notes                                                                                                                                                                     |
+| ----------------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `create_purchase_order`                               | purchases.manage  | idempotent on key; numbers `PO-YYYY-0001`                                                                                                                                 |
+| `update_purchase_order_draft`                         | purchases.manage  | draft only                                                                                                                                                                |
+| `confirm_purchase_order`                              | purchases.manage  | idempotent                                                                                                                                                                |
+| `cancel_purchase_order`                               | purchases.manage  | not after posted receipts                                                                                                                                                 |
+| `create_goods_receipt`                                | purchases.post    | creates lots; validates landed-cost allocation                                                                                                                            |
+| `post_goods_receipt`                                  | purchases.post    | the only path that increases green stock                                                                                                                                  |
+| `create_inventory_adjustment`                         | inventory.adjust  | create + post atomically; idempotent                                                                                                                                      |
+| `post_inventory_adjustment`                           | inventory.adjust  |                                                                                                                                                                           |
+| `reverse_inventory_adjustment`                        | inventory.adjust  | posts opposite movements                                                                                                                                                  |
+| `reserve_inventory` / `release_inventory_reservation` | inventory.read    | for later phases                                                                                                                                                          |
+| `create_business_with_owner`                          | service role only | provisioning                                                                                                                                                              |
+| `my_memberships`                                      | authenticated     | current user's businesses                                                                                                                                                 |
+| (members)                                             | members.manage    | plain inserts/updates on `business_members` under RLS + `app.business_members_guard`; auth users are created/invited with the service role from `members.service.ts` only |
 
 Functions raise errors prefixed `VALIDATION:`, `FORBIDDEN:`, `NOT_FOUND:`, `INVALID_STATE:`,
 `INSUFFICIENT_STOCK:` or `OVER_RECEIPT:`; `fromDatabaseError()` maps them to `AppError`.
 
 ## Views (security_invoker)
 
+- `business_member_directory_view` — memberships joined with profile email/name and the inviter's name; RLS of `business_members` applies.
 - `green_lot_inventory_view` — the inventory dashboard row: quantities, cost/kg, stock value, status.
 - `inventory_movement_history_view` — movements joined with location, lot, coffee and actor.
 - `inventory_reconciliation_view` — balance vs ledger differences (should always be empty).

@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { resolvePostLoginPath } from "@/lib/auth/mfa";
 import { headers } from "next/headers";
 import { z } from "zod";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -32,6 +33,8 @@ export async function loginAction(
     if (input.next && input.next.startsWith("/") && !input.next.startsWith("//")) {
       next = input.next;
     }
+    // MFA step-up or a business "require MFA" policy may change where we land.
+    next = await resolvePostLoginPath(next);
   } catch (error) {
     return fail(error);
   }
@@ -79,6 +82,7 @@ export async function updatePasswordAction(
   _prev: ActionResult | null,
   formData: FormData,
 ): Promise<ActionResult> {
+  let next = "/dashboard";
   try {
     const input = validate(resetSchema, Object.fromEntries(formData));
     const supabase = await createSupabaseServerClient();
@@ -88,8 +92,9 @@ export async function updatePasswordAction(
     if (!user) throw Errors.unauthenticated("Your reset link has expired. Request a new one.");
     const { error } = await supabase.auth.updateUser({ password: input.password });
     if (error) throw Errors.validation(error.message);
+    next = await resolvePostLoginPath("/dashboard");
   } catch (error) {
     return fail(error);
   }
-  redirect("/dashboard");
+  redirect(next);
 }

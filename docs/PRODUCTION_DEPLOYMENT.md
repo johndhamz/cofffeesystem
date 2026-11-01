@@ -18,7 +18,13 @@ explicit approval from the business owner; nothing in this repository deploys au
 2. **Auth settings** (Dashboard → Authentication):
    - Disable _Allow new users to sign up_.
    - Site URL = production URL; Redirect URLs = `https://<domain>/**` (and the Vercel preview domain if used).
-   - Email provider enabled; customise the recovery email template with the business name.
+   - Email provider enabled. **Email templates** (_Invite user_ and _Reset password_) must link to
+     the app's server-side confirm route with a token hash, exactly as `supabase/templates/*.html`
+     do locally (`{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=invite&next=/reset-password`
+     and `...&type=recovery...`). The default `{{ .ConfirmationURL }}` templates will not work with
+     the cookie-based session.
+   - **Multi-factor**: Authentication → Multi-Factor → enable _TOTP_ (enroll and verify). The app
+     offers enrolment under Settings → Security; owners may require it for everyone.
    - Minimum password length ≥ 8 (the app enforces 8 on reset).
      Alternatively edit `supabase/config.toml [auth]` and run `npx supabase config push`.
 3. **Storage**: buckets `roast-attachments` and `expense-receipts` are created by migrations

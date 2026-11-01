@@ -49,6 +49,7 @@ export function BusinessSettingsForm({
       costing_method: settings.costing_method as BusinessSettingsInput["costing_method"],
       default_roaster_id: settings.default_roaster_id ?? "",
       default_location_id: settings.default_location_id ?? "",
+      require_mfa: settings.require_mfa,
     },
   });
   const errors = form.formState.errors;
@@ -185,6 +186,21 @@ export function BusinessSettingsForm({
           </NativeSelect>
         </FormField>
       </div>
+      <FormField
+        name="require_mfa"
+        label="Require two-factor authentication"
+        description="Every member must enrol an authenticator app before using the app."
+      >
+        <NativeSelect
+          id="require_mfa"
+          disabled={disabled}
+          data-testid="select-require_mfa"
+          {...form.register("require_mfa")}
+        >
+          <option value="false">Optional (members may enable it)</option>
+          <option value="true">Required for all members</option>
+        </NativeSelect>
+      </FormField>
       {canUpdate ? (
         <Button type="submit" disabled={disabled} data-testid="settings-submit">
           {form.formState.isSubmitting ? <Loader2Icon className="animate-spin" /> : null}
