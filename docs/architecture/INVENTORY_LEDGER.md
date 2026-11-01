@@ -79,3 +79,27 @@ Nothing is edited. `reverse_inventory_adjustment` posts a new adjustment with ne
 
 `inventory_reconciliation_view` compares balances with the ledger. The integration suite asserts
 it is empty after every scenario, and the inventory page shows an alert if it is not.
+
+## Roast production (Phase 3)
+
+```
+create_roast_batch (draft; inputs = green lots + weights)
+→ start_roast_batch (in_progress; measurements/events recorded manually or attached)
+→ complete_roast_batch:
+     for each input lot: post_movement(-input_g, 'roast_consume', key 'roast:<batch>:in:<input>')
+                         allocated_green_cost = consume_cost_layers(lot item, input_g)
+     total = Σ allocated_green_cost + LPG + labor + overhead + other
+     post_movement(+roasted_g, 'roast_output', key 'roast:<batch>:out', total)
+     add_cost_layer(roasted_bulk item, roasted_g, total)
+     snapshot loss %, yield %, development ratio, cost per gram on the batch
+```
+
+- One `roasted_bulk` inventory item per completed batch, so every gram of roasted coffee traces to its
+  batch and, through `roast_batch_inputs`, to the green lots and their actual cost.
+- The whole completion is one PL/pgSQL function: if any lot lacks stock the transaction rolls back and
+  no roasted stock, cost layer or snapshot exists. Re-running completion on a completed batch returns
+  immediately; concurrent completions serialise on the batch row lock.
+- Roaster capacity is configuration (`roasters.capacity_g`, `capacity_policy` warn|block, optional
+  `max_gas_kpa`). Drafts only warn; completion enforces the policy.
+- Void of a completed batch posts `roast_void_consume` (−roasted) and `roast_void_restore` (+green
+  with the original allocated cost as a new layer) and is refused if any roasted stock was consumed.

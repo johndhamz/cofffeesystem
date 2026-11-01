@@ -60,6 +60,7 @@ Functions raise errors prefixed `VALIDATION:`, `FORBIDDEN:`, `NOT_FOUND:`, `INVA
 - `green_lot_inventory_view` — the inventory dashboard row: quantities, cost/kg, stock value, status.
 - `inventory_movement_history_view` — movements joined with location, lot, coffee and actor.
 - `inventory_reconciliation_view` — balance vs ledger differences (should always be empty).
+- `roast_batch_summary_view` — batch with roaster, profile, operator, lots, yield metrics, cost/kg and roasted stock on hand.
 
 ## Workflow
 

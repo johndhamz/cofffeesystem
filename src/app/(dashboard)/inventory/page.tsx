@@ -34,6 +34,11 @@ export default async function InventoryPage({ searchParams }: PageProps<"/invent
         description="Green coffee lots, balances and valuation. Balances reconcile to the movement ledger."
         actions={
           <>
+            <Button asChild variant="outline" data-testid="roasted-link">
+              <Link href="/inventory/roasted">
+                <BoxesIcon /> Roasted bulk
+              </Link>
+            </Button>
             <Button asChild variant="outline" data-testid="movements-link">
               <Link href="/inventory/movements">
                 <HistoryIcon /> Movements

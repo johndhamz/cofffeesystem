@@ -561,16 +561,258 @@ isOneToOne: false
       referencedColumns: ["id","business_id"]
     }
                   ]
-                },"roasters": {
+                },"roast_attachments": {
                   Row: {
-                    "business_id": string,"capacity_g": number,"created_at": string,"id": string,"is_active": boolean,"manufacturer": string | null,"model": string | null,"name": string,"notes": string | null,"updated_at": string
+                    "business_id": string,"created_at": string,"file_name": string,"file_type": string,"id": string,"roast_batch_id": string,"size_bytes": number | null,"storage_path": string,"uploaded_by": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "business_id": string,"capacity_g": number,"created_at"?: string,"id"?: string,"is_active"?: boolean,"manufacturer"?: string | null,"model"?: string | null,"name": string,"notes"?: string | null,"updated_at"?: string
+                    "business_id": string,"created_at"?: string,"file_name": string,"file_type": string,"id"?: string,"roast_batch_id": string,"size_bytes"?: number | null,"storage_path": string,"uploaded_by"?: string | null
                   }
                   Update: {
-                    "business_id"?: string,"capacity_g"?: number,"created_at"?: string,"id"?: string,"is_active"?: boolean,"manufacturer"?: string | null,"model"?: string | null,"name"?: string,"notes"?: string | null,"updated_at"?: string
+                    "business_id"?: string,"created_at"?: string,"file_name"?: string,"file_type"?: string,"id"?: string,"roast_batch_id"?: string,"size_bytes"?: number | null,"storage_path"?: string,"uploaded_by"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "roast_attachments_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "roast_attachments_roast_batch_id_business_id_fkey"
+      columns: ["roast_batch_id","business_id"]
+isOneToOne: false
+      referencedRelation: "roast_batch_summary_view"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "roast_attachments_roast_batch_id_business_id_fkey"
+      columns: ["roast_batch_id","business_id"]
+isOneToOne: false
+      referencedRelation: "roast_batches"
+      referencedColumns: ["id","business_id"]
+    }
+                  ]
+                },"roast_batch_costs": {
+                  Row: {
+                    "amount": number,"business_id": string,"cost_type": string,"created_at": string,"id": string,"notes": string | null,"roast_batch_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "amount": number,"business_id": string,"cost_type": string,"created_at"?: string,"id"?: string,"notes"?: string | null,"roast_batch_id": string
+                  }
+                  Update: {
+                    "amount"?: number,"business_id"?: string,"cost_type"?: string,"created_at"?: string,"id"?: string,"notes"?: string | null,"roast_batch_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "roast_batch_costs_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "roast_batch_costs_roast_batch_id_business_id_fkey"
+      columns: ["roast_batch_id","business_id"]
+isOneToOne: false
+      referencedRelation: "roast_batch_summary_view"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "roast_batch_costs_roast_batch_id_business_id_fkey"
+      columns: ["roast_batch_id","business_id"]
+isOneToOne: false
+      referencedRelation: "roast_batches"
+      referencedColumns: ["id","business_id"]
+    }
+                  ]
+                },"roast_batch_inputs": {
+                  Row: {
+                    "allocated_green_cost": number | null,"business_id": string,"created_at": string,"green_lot_id": string,"id": string,"input_weight_g": number,"roast_batch_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "allocated_green_cost"?: number | null,"business_id": string,"created_at"?: string,"green_lot_id": string,"id"?: string,"input_weight_g": number,"roast_batch_id": string
+                  }
+                  Update: {
+                    "allocated_green_cost"?: number | null,"business_id"?: string,"created_at"?: string,"green_lot_id"?: string,"id"?: string,"input_weight_g"?: number,"roast_batch_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "roast_batch_inputs_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "roast_batch_inputs_green_lot_id_business_id_fkey"
+      columns: ["green_lot_id","business_id"]
+isOneToOne: false
+      referencedRelation: "green_coffee_lots"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "roast_batch_inputs_green_lot_id_business_id_fkey"
+      columns: ["green_lot_id","business_id"]
+isOneToOne: false
+      referencedRelation: "green_lot_inventory_view"
+      referencedColumns: ["lot_id","business_id"]
+    },{
+      foreignKeyName: "roast_batch_inputs_roast_batch_id_business_id_fkey"
+      columns: ["roast_batch_id","business_id"]
+isOneToOne: false
+      referencedRelation: "roast_batch_summary_view"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "roast_batch_inputs_roast_batch_id_business_id_fkey"
+      columns: ["roast_batch_id","business_id"]
+isOneToOne: false
+      referencedRelation: "roast_batches"
+      referencedColumns: ["id","business_id"]
+    }
+                  ]
+                },"roast_batches": {
+                  Row: {
+                    "batch_number": string,"business_id": string,"charge_bt_c": number | null,"charge_et_c": number | null,"completed_at": string | null,"created_at": string,"created_by": string | null,"development_ratio_pct": number | null,"development_seconds": number | null,"drop_bt_c": number | null,"first_crack_bt_c": number | null,"first_crack_seconds": number | null,"green_cost": number | null,"green_weight_g": number,"id": string,"idempotency_key": string | null,"location_id": string,"notes": string | null,"operator_id": string | null,"production_cost_total": number | null,"roast_date": string,"roast_level": string | null,"roast_loss_pct": number | null,"roast_profile_id": string | null,"roast_yield_pct": number | null,"roasted_cost_per_g": number | null,"roasted_weight_g": number | null,"roaster_id": string,"started_at": string | null,"status": Database["public"]['Enums']["roast_batch_status"],"total_duration_seconds": number | null,"updated_at": string,"void_reason": string | null,"voided_at": string | null,"voided_by": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "batch_number": string,"business_id": string,"charge_bt_c"?: number | null,"charge_et_c"?: number | null,"completed_at"?: string | null,"created_at"?: string,"created_by"?: string | null,"development_ratio_pct"?: number | null,"development_seconds"?: number | null,"drop_bt_c"?: number | null,"first_crack_bt_c"?: number | null,"first_crack_seconds"?: number | null,"green_cost"?: number | null,"green_weight_g"?: number,"id"?: string,"idempotency_key"?: string | null,"location_id": string,"notes"?: string | null,"operator_id"?: string | null,"production_cost_total"?: number | null,"roast_date"?: string,"roast_level"?: string | null,"roast_loss_pct"?: number | null,"roast_profile_id"?: string | null,"roast_yield_pct"?: number | null,"roasted_cost_per_g"?: number | null,"roasted_weight_g"?: number | null,"roaster_id": string,"started_at"?: string | null,"status"?: Database["public"]['Enums']["roast_batch_status"],"total_duration_seconds"?: number | null,"updated_at"?: string,"void_reason"?: string | null,"voided_at"?: string | null,"voided_by"?: string | null
+                  }
+                  Update: {
+                    "batch_number"?: string,"business_id"?: string,"charge_bt_c"?: number | null,"charge_et_c"?: number | null,"completed_at"?: string | null,"created_at"?: string,"created_by"?: string | null,"development_ratio_pct"?: number | null,"development_seconds"?: number | null,"drop_bt_c"?: number | null,"first_crack_bt_c"?: number | null,"first_crack_seconds"?: number | null,"green_cost"?: number | null,"green_weight_g"?: number,"id"?: string,"idempotency_key"?: string | null,"location_id"?: string,"notes"?: string | null,"operator_id"?: string | null,"production_cost_total"?: number | null,"roast_date"?: string,"roast_level"?: string | null,"roast_loss_pct"?: number | null,"roast_profile_id"?: string | null,"roast_yield_pct"?: number | null,"roasted_cost_per_g"?: number | null,"roasted_weight_g"?: number | null,"roaster_id"?: string,"started_at"?: string | null,"status"?: Database["public"]['Enums']["roast_batch_status"],"total_duration_seconds"?: number | null,"updated_at"?: string,"void_reason"?: string | null,"voided_at"?: string | null,"voided_by"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "roast_batches_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "roast_batches_location_id_business_id_fkey"
+      columns: ["location_id","business_id"]
+isOneToOne: false
+      referencedRelation: "inventory_locations"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "roast_batches_operator_id_fkey"
+      columns: ["operator_id"]
+isOneToOne: false
+      referencedRelation: "user_profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "roast_batches_roast_profile_id_business_id_fkey"
+      columns: ["roast_profile_id","business_id"]
+isOneToOne: false
+      referencedRelation: "roast_profiles"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "roast_batches_roaster_id_business_id_fkey"
+      columns: ["roaster_id","business_id"]
+isOneToOne: false
+      referencedRelation: "roasters"
+      referencedColumns: ["id","business_id"]
+    }
+                  ]
+                },"roast_events": {
+                  Row: {
+                    "business_id": string,"created_at": string,"elapsed_seconds": number,"event_type": Database["public"]['Enums']["roast_event_type"],"id": string,"notes": string | null,"roast_batch_id": string,"temperature_c": number | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "business_id": string,"created_at"?: string,"elapsed_seconds": number,"event_type": Database["public"]['Enums']["roast_event_type"],"id"?: string,"notes"?: string | null,"roast_batch_id": string,"temperature_c"?: number | null
+                  }
+                  Update: {
+                    "business_id"?: string,"created_at"?: string,"elapsed_seconds"?: number,"event_type"?: Database["public"]['Enums']["roast_event_type"],"id"?: string,"notes"?: string | null,"roast_batch_id"?: string,"temperature_c"?: number | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "roast_events_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "roast_events_roast_batch_id_business_id_fkey"
+      columns: ["roast_batch_id","business_id"]
+isOneToOne: false
+      referencedRelation: "roast_batch_summary_view"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "roast_events_roast_batch_id_business_id_fkey"
+      columns: ["roast_batch_id","business_id"]
+isOneToOne: false
+      referencedRelation: "roast_batches"
+      referencedColumns: ["id","business_id"]
+    }
+                  ]
+                },"roast_measurements": {
+                  Row: {
+                    "airflow_pct": number | null,"bt_c": number | null,"business_id": string,"created_at": string,"drum_speed_pct": number | null,"elapsed_seconds": number,"et_c": number | null,"gas_kpa": number | null,"id": string,"roast_batch_id": string,"ror_c_per_min": number | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "airflow_pct"?: number | null,"bt_c"?: number | null,"business_id": string,"created_at"?: string,"drum_speed_pct"?: number | null,"elapsed_seconds": number,"et_c"?: number | null,"gas_kpa"?: number | null,"id"?: string,"roast_batch_id": string,"ror_c_per_min"?: number | null
+                  }
+                  Update: {
+                    "airflow_pct"?: number | null,"bt_c"?: number | null,"business_id"?: string,"created_at"?: string,"drum_speed_pct"?: number | null,"elapsed_seconds"?: number,"et_c"?: number | null,"gas_kpa"?: number | null,"id"?: string,"roast_batch_id"?: string,"ror_c_per_min"?: number | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "roast_measurements_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "roast_measurements_roast_batch_id_business_id_fkey"
+      columns: ["roast_batch_id","business_id"]
+isOneToOne: false
+      referencedRelation: "roast_batch_summary_view"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "roast_measurements_roast_batch_id_business_id_fkey"
+      columns: ["roast_batch_id","business_id"]
+isOneToOne: false
+      referencedRelation: "roast_batches"
+      referencedColumns: ["id","business_id"]
+    }
+                  ]
+                },"roast_profiles": {
+                  Row: {
+                    "business_id": string,"created_at": string,"description": string | null,"id": string,"is_active": boolean,"name": string,"roaster_id": string | null,"target_notes": string | null,"target_roast_level": string | null,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "business_id": string,"created_at"?: string,"description"?: string | null,"id"?: string,"is_active"?: boolean,"name": string,"roaster_id"?: string | null,"target_notes"?: string | null,"target_roast_level"?: string | null,"updated_at"?: string
+                  }
+                  Update: {
+                    "business_id"?: string,"created_at"?: string,"description"?: string | null,"id"?: string,"is_active"?: boolean,"name"?: string,"roaster_id"?: string | null,"target_notes"?: string | null,"target_roast_level"?: string | null,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "roast_profiles_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "roast_profiles_roaster_id_business_id_fkey"
+      columns: ["roaster_id","business_id"]
+isOneToOne: false
+      referencedRelation: "roasters"
+      referencedColumns: ["id","business_id"]
+    }
+                  ]
+                },"roasters": {
+                  Row: {
+                    "business_id": string,"capacity_g": number,"capacity_policy": string,"created_at": string,"id": string,"is_active": boolean,"manufacturer": string | null,"max_gas_kpa": number | null,"model": string | null,"name": string,"notes": string | null,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "business_id": string,"capacity_g": number,"capacity_policy"?: string,"created_at"?: string,"id"?: string,"is_active"?: boolean,"manufacturer"?: string | null,"max_gas_kpa"?: number | null,"model"?: string | null,"name": string,"notes"?: string | null,"updated_at"?: string
+                  }
+                  Update: {
+                    "business_id"?: string,"capacity_g"?: number,"capacity_policy"?: string,"created_at"?: string,"id"?: string,"is_active"?: boolean,"manufacturer"?: string | null,"max_gas_kpa"?: number | null,"model"?: string | null,"name"?: string,"notes"?: string | null,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -718,11 +960,52 @@ isOneToOne: false
       referencedColumns: ["id","business_id"]
     }
                   ]
+                },"roast_batch_summary_view": {
+                  Row: {
+                    "batch_number": string,"business_id": string,"coffee_names": string | null,"completed_at": string | null,"development_ratio_pct": number | null,"development_seconds": number | null,"first_crack_seconds": number | null,"green_cost": number | null,"green_weight_g": number,"id": string,"location_id": string,"location_name": string,"lot_codes": string | null,"lot_count": number | null,"operator_id": string | null,"operator_name": string | null,"production_cost_total": number | null,"profile_name": string | null,"roast_date": string,"roast_level": string | null,"roast_loss_pct": number | null,"roast_profile_id": string | null,"roast_yield_pct": number | null,"roasted_available_g": number | null,"roasted_cost_per_g": number | null,"roasted_cost_per_kg": number | null,"roasted_item_id": string | null,"roasted_on_hand_g": number | null,"roasted_reserved_g": number | null,"roasted_stock_value": number | null,"roasted_weight_g": number | null,"roaster_capacity_g": number,"roaster_id": string,"roaster_name": string,"started_at": string | null,"status": Database["public"]['Enums']["roast_batch_status"],"total_duration_seconds": number | null
+                  }
+                  ComputedFields: never
+                  Relationships: [
+                    {
+      foreignKeyName: "roast_batches_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "roast_batches_location_id_business_id_fkey"
+      columns: ["location_id","business_id"]
+isOneToOne: false
+      referencedRelation: "inventory_locations"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "roast_batches_operator_id_fkey"
+      columns: ["operator_id"]
+isOneToOne: false
+      referencedRelation: "user_profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "roast_batches_roast_profile_id_business_id_fkey"
+      columns: ["roast_profile_id","business_id"]
+isOneToOne: false
+      referencedRelation: "roast_profiles"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "roast_batches_roaster_id_business_id_fkey"
+      columns: ["roaster_id","business_id"]
+isOneToOne: false
+      referencedRelation: "roasters"
+      referencedColumns: ["id","business_id"]
+    }
+                  ]
                 }
           }
           Functions: {
             "cancel_purchase_order":
 { Args: { "p_purchase_order_id": string }; Returns: undefined
+                           },
+"complete_roast_batch":
+{ Args: { "p_batch_id": string,"p_charge_bt_c": number,"p_charge_et_c": number,"p_costs": Json,"p_drop_bt_c": number,"p_first_crack_bt_c": number,"p_first_crack_seconds": number,"p_notes": string,"p_roast_level": string,"p_roasted_weight_g": number,"p_total_duration_seconds": number }; Returns: string
                            },
 "confirm_purchase_order":
 { Args: { "p_purchase_order_id": string }; Returns: undefined
@@ -738,6 +1021,9 @@ isOneToOne: false
                            },
 "create_purchase_order":
 { Args: { "p_additional_costs": number,"p_business_id": string,"p_idempotency_key": string,"p_items": Json,"p_notes": string,"p_ordered_at": string,"p_supplier_id": string }; Returns: string
+                           },
+"create_roast_batch":
+{ Args: { "p_business_id": string,"p_idempotency_key": string,"p_inputs": Json,"p_location_id": string,"p_notes": string,"p_operator_id": string,"p_roast_date": string,"p_roast_profile_id": string,"p_roaster_id": string }; Returns: string
                            },
 "my_memberships":
 { Args: Record<PropertyKey, never>; Returns: {
@@ -759,12 +1045,21 @@ isOneToOne: false
 "reverse_inventory_adjustment":
 { Args: { "p_adjustment_id": string,"p_idempotency_key": string }; Returns: string
                            },
+"start_roast_batch":
+{ Args: { "p_batch_id": string }; Returns: undefined
+                           },
 "update_purchase_order_draft":
 { Args: { "p_additional_costs": number,"p_items": Json,"p_notes": string,"p_ordered_at": string,"p_purchase_order_id": string,"p_supplier_id": string }; Returns: string
+                           },
+"update_roast_batch_draft":
+{ Args: { "p_batch_id": string,"p_inputs": Json,"p_location_id": string,"p_notes": string,"p_operator_id": string,"p_roast_date": string,"p_roast_profile_id": string,"p_roaster_id": string }; Returns: string
+                           },
+"void_roast_batch":
+{ Args: { "p_batch_id": string,"p_idempotency_key": string,"p_reason": string }; Returns: undefined
                            }
           }
           Enums: {
-            "goods_receipt_status": "draft"|"posted"|"cancelled","inventory_adjustment_status": "draft"|"posted"|"reversed","inventory_item_type": "green_coffee_lot"|"roasted_bulk"|"finished_product"|"packaging_material","inventory_movement_type": "receipt"|"adjustment"|"adjustment_reversal"|"roast_consume"|"roast_output"|"pack_consume"|"pack_output"|"sale"|"sale_return"|"transfer_in"|"transfer_out"|"write_off","inventory_reservation_status": "active"|"released"|"consumed","member_role": "owner"|"roaster"|"inventory_staff"|"sales_staff"|"viewer","purchase_order_status": "draft"|"confirmed"|"partially_received"|"received"|"cancelled"
+            "goods_receipt_status": "draft"|"posted"|"cancelled","inventory_adjustment_status": "draft"|"posted"|"reversed","inventory_item_type": "green_coffee_lot"|"roasted_bulk"|"finished_product"|"packaging_material","inventory_movement_type": "receipt"|"adjustment"|"adjustment_reversal"|"roast_consume"|"roast_output"|"pack_consume"|"pack_output"|"sale"|"sale_return"|"transfer_in"|"transfer_out"|"write_off"|"roast_void_restore"|"roast_void_consume","inventory_reservation_status": "active"|"released"|"consumed","member_role": "owner"|"roaster"|"inventory_staff"|"sales_staff"|"viewer","purchase_order_status": "draft"|"confirmed"|"partially_received"|"received"|"cancelled","roast_batch_status": "draft"|"in_progress"|"completed"|"voided","roast_event_type": "charge"|"turning_point"|"dry_end"|"first_crack_start"|"first_crack_end"|"second_crack_start"|"drop"|"cooling_end"|"gas_change"|"airflow_change"|"drum_change"|"note"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -880,7 +1175,7 @@ export type CompositeTypes<
 export const Constants = {
   "public": {
           Enums: {
-            "goods_receipt_status": ["draft", "posted", "cancelled"],"inventory_adjustment_status": ["draft", "posted", "reversed"],"inventory_item_type": ["green_coffee_lot", "roasted_bulk", "finished_product", "packaging_material"],"inventory_movement_type": ["receipt", "adjustment", "adjustment_reversal", "roast_consume", "roast_output", "pack_consume", "pack_output", "sale", "sale_return", "transfer_in", "transfer_out", "write_off"],"inventory_reservation_status": ["active", "released", "consumed"],"member_role": ["owner", "roaster", "inventory_staff", "sales_staff", "viewer"],"purchase_order_status": ["draft", "confirmed", "partially_received", "received", "cancelled"]
+            "goods_receipt_status": ["draft", "posted", "cancelled"],"inventory_adjustment_status": ["draft", "posted", "reversed"],"inventory_item_type": ["green_coffee_lot", "roasted_bulk", "finished_product", "packaging_material"],"inventory_movement_type": ["receipt", "adjustment", "adjustment_reversal", "roast_consume", "roast_output", "pack_consume", "pack_output", "sale", "sale_return", "transfer_in", "transfer_out", "write_off", "roast_void_restore", "roast_void_consume"],"inventory_reservation_status": ["active", "released", "consumed"],"member_role": ["owner", "roaster", "inventory_staff", "sales_staff", "viewer"],"purchase_order_status": ["draft", "confirmed", "partially_received", "received", "cancelled"],"roast_batch_status": ["draft", "in_progress", "completed", "voided"],"roast_event_type": ["charge", "turning_point", "dry_end", "first_crack_start", "first_crack_end", "second_crack_start", "drop", "cooling_end", "gas_change", "airflow_change", "drum_change", "note"]
           }
         }
 } as const

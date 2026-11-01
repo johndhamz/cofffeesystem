@@ -20,7 +20,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { FormField } from "@/components/shared/form-field";
-import { MASTER_ENTITIES, type FieldDef, type MasterEntityKey } from "./entities";
+import {
+  MASTER_ENTITIES,
+  type DynamicOptions,
+  type FieldDef,
+  type MasterEntityKey,
+} from "./entities";
 import { createMasterRecordAction, updateMasterRecordAction } from "./actions";
 import type { ActionResult } from "@/lib/errors";
 import { cn } from "@/lib/utils";
@@ -34,6 +39,7 @@ interface EntityFormDialogProps {
   /** Controlled mode (used when the dialog is opened from a menu). */
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  dynamicOptions?: DynamicOptions;
 }
 
 export function EntityFormDialog({
@@ -43,6 +49,7 @@ export function EntityFormDialog({
   onSaved,
   open: controlledOpen,
   onOpenChange,
+  dynamicOptions,
 }: EntityFormDialogProps) {
   const entity = MASTER_ENTITIES[entityKey];
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
@@ -128,7 +135,12 @@ export function EntityFormDialog({
           ) : null}
           <div className="grid gap-4 sm:grid-cols-2">
             {entity.fields.map((field) => (
-              <FieldControl key={field.name} field={field} form={form} />
+              <FieldControl
+                key={field.name}
+                field={field}
+                form={form}
+                options={dynamicOptions?.[field.name]}
+              />
             ))}
           </div>
           <DialogFooter>
@@ -154,9 +166,11 @@ export function EntityFormDialog({
 function FieldControl({
   field,
   form,
+  options,
 }: {
   field: FieldDef;
   form: ReturnType<typeof useForm<FieldValues>>;
+  options?: { value: string; label: string }[];
 }) {
   const error = form.formState.errors[field.name]?.message as string | undefined;
   const common = {
@@ -179,7 +193,7 @@ function FieldControl({
       ) : field.type === "select" ? (
         <NativeSelect {...common} {...form.register(field.name)}>
           {!field.required ? <option value="">—</option> : null}
-          {field.options?.map((o) => (
+          {(options ?? field.options)?.map((o) => (
             <option key={o.value} value={o.value}>
               {o.label}
             </option>

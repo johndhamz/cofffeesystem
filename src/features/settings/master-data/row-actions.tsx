@@ -15,7 +15,7 @@ import {
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { EntityFormDialog } from "./entity-form-dialog";
 import { deleteMasterRecordAction, setMasterRecordActiveAction } from "./actions";
-import { MASTER_ENTITIES, type MasterEntityKey } from "./entities";
+import { MASTER_ENTITIES, type DynamicOptions, type MasterEntityKey } from "./entities";
 
 interface RowActionsProps {
   entityKey: MasterEntityKey;
@@ -24,6 +24,7 @@ interface RowActionsProps {
   canDelete: boolean;
   /** Render as full buttons (detail page) instead of a compact menu */
   expanded?: boolean;
+  dynamicOptions?: DynamicOptions;
 }
 
 export function MasterRowActions({
@@ -32,6 +33,7 @@ export function MasterRowActions({
   canManage,
   canDelete,
   expanded,
+  dynamicOptions,
 }: RowActionsProps) {
   const entity = MASTER_ENTITIES[entityKey];
   const router = useRouter();
@@ -62,7 +64,7 @@ export function MasterRowActions({
     router.refresh();
   }
 
-  const editProps = { entityKey, record, onSaved: () => router.refresh() } as const;
+  const editProps = { entityKey, record, dynamicOptions, onSaved: () => router.refresh() } as const;
   const toggleProps = {
     title: record.is_active ? `Deactivate ${record.name}?` : `Activate ${record.name}?`,
     description: record.is_active

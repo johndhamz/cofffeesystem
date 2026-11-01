@@ -9,7 +9,11 @@ import {
   type MasterRow,
   type MasterTable,
 } from "@/server/repositories/master-data.repository";
-import { MASTER_ENTITIES, type MasterEntityKey } from "@/features/settings/master-data/entities";
+import {
+  MASTER_ENTITIES,
+  type DynamicOptions,
+  type MasterEntityKey,
+} from "@/features/settings/master-data/entities";
 import type { Paginated } from "@/types";
 
 /**
@@ -25,7 +29,7 @@ export async function listMasterRecords<K extends MasterEntityKey>(
   query: ListQuery,
 ): Promise<Paginated<MasterRow<(typeof MASTER_ENTITIES)[K]["table"]>>> {
   const entity = MASTER_ENTITIES[key];
-  const ctx = await requirePermission("master_data.read");
+  const ctx = await requirePermission(entity.readPermission ?? "master_data.read");
   const db = await createSupabaseServerClient();
   const repo = masterDataRepository(db, entity.table);
   return repo.list(ctx.business.businessId, query, {
@@ -39,7 +43,7 @@ export async function listActiveMasterRecords<K extends MasterEntityKey>(
   key: K,
 ): Promise<MasterRow<(typeof MASTER_ENTITIES)[K]["table"]>[]> {
   const entity = MASTER_ENTITIES[key];
-  const ctx = await requirePermission("master_data.read");
+  const ctx = await requirePermission(entity.readPermission ?? "master_data.read");
   const db = await createSupabaseServerClient();
   return masterDataRepository(db, entity.table).listActive(ctx.business.businessId) as Promise<
     MasterRow<(typeof MASTER_ENTITIES)[K]["table"]>[]
@@ -51,7 +55,7 @@ export async function getMasterRecord<K extends MasterEntityKey>(
   id: string,
 ): Promise<MasterRow<(typeof MASTER_ENTITIES)[K]["table"]> | null> {
   const entity = MASTER_ENTITIES[key];
-  const ctx = await requirePermission("master_data.read");
+  const ctx = await requirePermission(entity.readPermission ?? "master_data.read");
   const db = await createSupabaseServerClient();
   return masterDataRepository(db, entity.table).getById(
     ctx.business.businessId,
@@ -141,6 +145,29 @@ export async function deleteMasterRecord<K extends MasterEntityKey>(key: K, id: 
     }
     throw error;
   }
+}
+
+/** Loads select options for fields declared with `optionsFrom` (active records of the referenced entity). */
+export async function getDynamicOptions<K extends MasterEntityKey>(
+  key: K,
+): Promise<DynamicOptions> {
+  const entity = MASTER_ENTITIES[key];
+  const sources = [
+    ...new Set(entity.fields.map((f) => f.optionsFrom).filter(Boolean)),
+  ] as NonNullable<(typeof entity.fields)[number]["optionsFrom"]>[];
+  const out: DynamicOptions = {};
+  if (sources.length === 0) return out;
+  const ctx = await requirePermission(entity.readPermission ?? "master_data.read");
+  const db = await createSupabaseServerClient();
+  for (const source of sources) {
+    const rows = await masterDataRepository(db, source).listActive(ctx.business.businessId);
+    const options = (rows as { id: string; name: string }[]).map((r) => ({
+      value: r.id,
+      label: r.name,
+    }));
+    for (const field of entity.fields) if (field.optionsFrom === source) out[field.name] = options;
+  }
+  return out;
 }
 
 function nullifyUndefined<T extends Record<string, unknown>>(values: T): T {

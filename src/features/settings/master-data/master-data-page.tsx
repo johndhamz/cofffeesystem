@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { SearchInput, ParamSelect } from "@/components/shared/data-table";
 import { parseListQuery } from "@/lib/validation/common";
 import { getSessionContext, can } from "@/lib/auth/session";
-import { listMasterRecords } from "@/server/services/master-data.service";
+import { getDynamicOptions, listMasterRecords } from "@/server/services/master-data.service";
 import { MASTER_ENTITIES, type MasterEntityKey } from "./entities";
 import { EntityFormDialog } from "./entity-form-dialog";
 import { MasterDataTable } from "./master-data-table";
@@ -19,13 +19,18 @@ interface MasterDataPageProps {
 export async function MasterDataPage({ entityKey, searchParams, breadcrumb }: MasterDataPageProps) {
   const entity = MASTER_ENTITIES[entityKey];
   const query = parseListQuery(searchParams);
-  const [ctx, data] = await Promise.all([getSessionContext(), listMasterRecords(entityKey, query)]);
+  const [ctx, data, dynamicOptions] = await Promise.all([
+    getSessionContext(),
+    listMasterRecords(entityKey, query),
+    getDynamicOptions(entityKey),
+  ]);
   const canManage = can(ctx, entity.managePermission);
   const canDelete = ctx?.business?.role === "owner";
 
   const createButton = canManage ? (
     <EntityFormDialog
       entityKey={entityKey}
+      dynamicOptions={dynamicOptions}
       trigger={
         <Button data-testid="create-button">
           <PlusIcon /> New {entity.singular.toLowerCase()}
@@ -61,6 +66,7 @@ export async function MasterDataPage({ entityKey, searchParams, breadcrumb }: Ma
         canManage={canManage}
         canDelete={canDelete}
         emptyAction={createButton}
+        dynamicOptions={dynamicOptions}
       />
     </div>
   );

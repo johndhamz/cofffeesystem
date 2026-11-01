@@ -118,11 +118,12 @@ test.describe("master data as owner", () => {
     await settingsPage.submit().click();
     await expect(page.getByText("Settings saved")).toBeVisible();
     await page.reload();
-    await expect(settingsPage.defaultRoaster()).toContainText("Yoshan DY-2kg");
-    const selected = await settingsPage
+    const yoshanValue = await settingsPage
       .defaultRoaster()
-      .evaluate((el) => (el as HTMLSelectElement).selectedOptions[0]?.text);
-    expect(selected).toBe("Yoshan DY-2kg");
+      .locator("option", { hasText: "Yoshan DY-2kg" })
+      .getAttribute("value");
+    // toHaveValue retries until React has hydrated the form with the saved setting.
+    await expect(settingsPage.defaultRoaster()).toHaveValue(yoshanValue!);
   });
 
   test("list supports status filter, sorting and pagination controls", async ({

@@ -8,13 +8,17 @@ import { ActiveBadge } from "@/components/shared/status-badge";
 import { WeightDisplay } from "@/components/shared/weight-display";
 import { formatManilaDateTime } from "@/lib/units/time";
 import { getSessionContext, can } from "@/lib/auth/session";
-import { getMasterRecord } from "@/server/services/master-data.service";
+import { getDynamicOptions, getMasterRecord } from "@/server/services/master-data.service";
 import { MASTER_ENTITIES, OPTION_LABELS, type MasterEntityKey } from "./entities";
 import { MasterRowActions } from "./row-actions";
 
 export async function EntityDetail({ entityKey, id }: { entityKey: MasterEntityKey; id: string }) {
   const entity = MASTER_ENTITIES[entityKey];
-  const [ctx, record] = await Promise.all([getSessionContext(), getMasterRecord(entityKey, id)]);
+  const [ctx, record, dynamicOptions] = await Promise.all([
+    getSessionContext(),
+    getMasterRecord(entityKey, id),
+    getDynamicOptions(entityKey),
+  ]);
   if (!record) notFound();
   const row = record as Record<string, unknown> & {
     id: string;
@@ -68,7 +72,9 @@ export async function EntityDetail({ entityKey, id }: { entityKey: MasterEntityK
                     ) : field.name === "capacity_g" ? (
                       <WeightDisplay grams={Number(value)} />
                     ) : (
-                      (OPTION_LABELS[String(value)] ?? String(value))
+                      (dynamicOptions[field.name]?.find((o) => o.value === value)?.label ??
+                      OPTION_LABELS[String(value)] ??
+                      String(value))
                     )}
                   </dd>
                 </div>

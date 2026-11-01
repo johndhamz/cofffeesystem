@@ -28,7 +28,9 @@ Covered flows: login/logout/redirects, wrong password, reset request, supplier c
 duplicate rejection, green coffee create with blank measurements, altitude validation, roaster
 configuration + default roaster, list sorting/filtering, viewer restrictions, create purchase →
 confirm → receive 10 kg → stock +10 kg, second lot with separate balance, authorized adjustment,
-movement history, viewer cannot adjust.
+movement history, viewer cannot adjust, receive 10 kg → roast 1.5 kg → 1.26 kg out (16% loss, 84% yield,
+20% DTR) → green 8.5 kg and roasted 1.26 kg with cost/kg, immutability of completed batches, viewer
+cannot create roasts.
 
 ## CI
 

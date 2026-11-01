@@ -6,6 +6,7 @@ import {
   optionalTrimmed,
   requiredName,
   requiredNumber,
+  optionalUuid,
 } from "@/lib/validation/common";
 
 /**
@@ -29,6 +30,8 @@ export interface FieldDef {
   max?: number;
   /** span 2 columns in the dialog grid */
   wide?: boolean;
+  /** Options loaded server-side from another entity (e.g. roasters); resolved by MasterDataPage. */
+  optionsFrom?: "roasters";
 }
 
 export interface ColumnDef {
@@ -48,6 +51,8 @@ export interface MasterEntityDef<TTable extends string, TSchema extends z.ZodTyp
   description: string;
   basePath: string;
   managePermission: Permission;
+  /** defaults to master_data.read */
+  readPermission?: Permission;
   schema: TSchema;
   fields: FieldDef[];
   columns: ColumnDef[];
@@ -154,6 +159,26 @@ function defineEntity<TTable extends string, TSchema extends z.ZodType>(
 ): MasterEntityDef<TTable, TSchema> {
   return def;
 }
+
+const ROAST_LEVELS = [
+  { value: "light", label: "Light" },
+  { value: "medium_light", label: "Medium-light" },
+  { value: "medium", label: "Medium" },
+  { value: "medium_dark", label: "Medium-dark" },
+  { value: "dark", label: "Dark" },
+];
+
+export const roastProfileSchema = z.object({
+  name: requiredName(),
+  roaster_id: optionalUuid,
+  target_roast_level: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z.enum(["light", "medium_light", "medium", "medium_dark", "dark"]).optional(),
+  ),
+  target_notes: optionalTrimmed(2000),
+  description: optionalTrimmed(2000),
+  is_active: booleanFromForm.default(true),
+});
 
 export const MASTER_ENTITIES = {
   suppliers: defineEntity({
@@ -386,6 +411,50 @@ export const MASTER_ENTITIES = {
     sortableColumns: ["name", "channel_type", "is_active", "created_at"],
     defaultSort: "name",
   }),
+  roast_profiles: defineEntity({
+    key: "roast_profiles",
+    table: "roast_profiles",
+    singular: "Roast profile",
+    plural: "Roast profiles",
+    description: "Target roast levels and notes to follow when roasting.",
+    basePath: "/roasting/profiles",
+    managePermission: "roasting.manage",
+    readPermission: "roasting.read",
+    schema: roastProfileSchema,
+    fields: [
+      {
+        name: "name",
+        label: "Name",
+        type: "text",
+        required: true,
+        wide: true,
+        placeholder: "Benguet Washed – Medium",
+      },
+      { name: "roaster_id", label: "Roaster", type: "select", optionsFrom: "roasters" },
+      {
+        name: "target_roast_level",
+        label: "Target roast level",
+        type: "select",
+        options: ROAST_LEVELS,
+      },
+      {
+        name: "target_notes",
+        label: "Target notes",
+        type: "textarea",
+        wide: true,
+        placeholder: "Charge 200°C, FC ~8:30, DTR 18–22%…",
+      },
+      { name: "description", label: "Description", type: "textarea", wide: true },
+    ],
+    columns: [
+      { key: "name", label: "Name", sortable: true },
+      { key: "target_roast_level", label: "Target level", sortable: true },
+      { key: "is_active", label: "Status", kind: "badge", sortable: true },
+    ],
+    searchColumns: ["name", "target_notes"],
+    sortableColumns: ["name", "target_roast_level", "is_active", "created_at"],
+    defaultSort: "name",
+  }),
 };
 
 export type MasterEntityKey = keyof typeof MASTER_ENTITIES;
@@ -396,5 +465,10 @@ export function isMasterEntityKey(value: string): value is MasterEntityKey {
 }
 
 export const OPTION_LABELS: Record<string, string> = Object.fromEntries(
-  [...LOCATION_TYPES, ...CLASSIFICATIONS, ...CHANNEL_TYPES].map((o) => [o.value, o.label]),
+  [...LOCATION_TYPES, ...CLASSIFICATIONS, ...CHANNEL_TYPES, ...ROAST_LEVELS].map((o) => [
+    o.value,
+    o.label,
+  ]),
 );
+
+export type DynamicOptions = Record<string, { value: string; label: string }[]>;

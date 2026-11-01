@@ -4,7 +4,12 @@ import Link from "next/link";
 import { DataTable, type DataTableColumn } from "@/components/shared/data-table";
 import { ActiveBadge } from "@/components/shared/status-badge";
 import { WeightDisplay } from "@/components/shared/weight-display";
-import { MASTER_ENTITIES, OPTION_LABELS, type MasterEntityKey } from "./entities";
+import {
+  MASTER_ENTITIES,
+  OPTION_LABELS,
+  type DynamicOptions,
+  type MasterEntityKey,
+} from "./entities";
 import { MasterRowActions } from "./row-actions";
 import type { Paginated } from "@/types";
 
@@ -16,6 +21,7 @@ interface MasterDataTableProps {
   canManage: boolean;
   canDelete: boolean;
   emptyAction?: React.ReactNode;
+  dynamicOptions?: DynamicOptions;
 }
 
 export function MasterDataTable({
@@ -24,6 +30,7 @@ export function MasterDataTable({
   canManage,
   canDelete,
   emptyAction,
+  dynamicOptions,
 }: MasterDataTableProps) {
   const entity = MASTER_ENTITIES[entityKey];
 
@@ -50,7 +57,8 @@ export function MasterDataTable({
         return <WeightDisplay grams={typeof value === "number" ? value : null} />;
       if (value === null || value === undefined || value === "")
         return <span className="text-muted-foreground">—</span>;
-      return OPTION_LABELS[String(value)] ?? String(value);
+      const dynamic = dynamicOptions?.[col.key]?.find((o) => o.value === value)?.label;
+      return dynamic ?? OPTION_LABELS[String(value)] ?? String(value);
     },
   }));
 
@@ -65,6 +73,7 @@ export function MasterDataTable({
           record={row}
           canManage={canManage}
           canDelete={canDelete}
+          dynamicOptions={dynamicOptions}
         />
       ),
     });
