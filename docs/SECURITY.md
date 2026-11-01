@@ -50,6 +50,10 @@ default settings (PHP, Asia/Manila, Yoshan DY-2kg, default location, expense cat
 channels), adds the user as `owner`, and prints a one-time password if none was given. The owner
 should change it via **Forgot password** on first login.
 
+Additional members are invited from Settings → Team members. An administrator can also add an
+owner to an existing business without the UI: `npm run add:member -- --email <email> --name "<name>"`
+(service-role key from `.env.hosted`; prints a one-time password once).
+
 Additional members are invited from Settings → Team members. `members.service.ts` uses the
 service-role client only to create/invite the auth user (`auth.admin.inviteUserByEmail`); the
 membership row is inserted as the owner, so RLS, the membership guard (last active owner, no
