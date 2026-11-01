@@ -109,6 +109,38 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"cost_allocations": {
+                  Row: {
+                    "amount": number,"business_id": string,"created_at": string,"created_by": string | null,"expense_id": string,"id": string,"notes": string | null,"source_id": string,"source_type": string,"target_id": string,"target_type": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "amount": number,"business_id": string,"created_at"?: string,"created_by"?: string | null,"expense_id": string,"id"?: string,"notes"?: string | null,"source_id": string,"source_type"?: string,"target_id": string,"target_type": string
+                  }
+                  Update: {
+                    "amount"?: number,"business_id"?: string,"created_at"?: string,"created_by"?: string | null,"expense_id"?: string,"id"?: string,"notes"?: string | null,"source_id"?: string,"source_type"?: string,"target_id"?: string,"target_type"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "cost_allocations_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "cost_allocations_expense_id_business_id_fkey"
+      columns: ["expense_id","business_id"]
+isOneToOne: false
+      referencedRelation: "expenses"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "cost_allocations_expense_id_business_id_fkey"
+      columns: ["expense_id","business_id"]
+isOneToOne: false
+      referencedRelation: "report_expenses_view"
+      referencedColumns: ["id","business_id"]
+    }
+                  ]
                 },"customers": {
                   Row: {
                     "address": string | null,"business_id": string,"created_at": string,"customer_type": string,"email": string | null,"id": string,"is_active": boolean,"name": string,"notes": string | null,"payment_terms_days": number,"phone": string | null,"updated_at": string
@@ -167,6 +199,38 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "businesses"
       referencedColumns: ["id"]
+    }
+                  ]
+                },"expenses": {
+                  Row: {
+                    "amount": number,"business_id": string,"cost_treatment": string,"created_at": string,"created_by": string | null,"description": string,"expense_category_id": string,"expense_number": string,"id": string,"idempotency_key": string | null,"incurred_at": string,"is_voided": boolean,"notes": string | null,"payment_method": Database["public"]['Enums']["payment_method"] | null,"payment_reference": string | null,"receipt_path": string | null,"supplier_id": string | null,"updated_at": string,"void_reason": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "amount": number,"business_id": string,"cost_treatment": string,"created_at"?: string,"created_by"?: string | null,"description": string,"expense_category_id": string,"expense_number"?: string,"id"?: string,"idempotency_key"?: string | null,"incurred_at"?: string,"is_voided"?: boolean,"notes"?: string | null,"payment_method"?: Database["public"]['Enums']["payment_method"] | null,"payment_reference"?: string | null,"receipt_path"?: string | null,"supplier_id"?: string | null,"updated_at"?: string,"void_reason"?: string | null
+                  }
+                  Update: {
+                    "amount"?: number,"business_id"?: string,"cost_treatment"?: string,"created_at"?: string,"created_by"?: string | null,"description"?: string,"expense_category_id"?: string,"expense_number"?: string,"id"?: string,"idempotency_key"?: string | null,"incurred_at"?: string,"is_voided"?: boolean,"notes"?: string | null,"payment_method"?: Database["public"]['Enums']["payment_method"] | null,"payment_reference"?: string | null,"receipt_path"?: string | null,"supplier_id"?: string | null,"updated_at"?: string,"void_reason"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "expenses_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "expenses_expense_category_id_business_id_fkey"
+      columns: ["expense_category_id","business_id"]
+isOneToOne: false
+      referencedRelation: "expense_categories"
+      referencedColumns: ["id","business_id"]
+    },{
+      foreignKeyName: "expenses_supplier_id_business_id_fkey"
+      columns: ["supplier_id","business_id"]
+isOneToOne: false
+      referencedRelation: "suppliers"
+      referencedColumns: ["id","business_id"]
     }
                   ]
                 },"finished_goods_lots": {
@@ -1469,6 +1533,12 @@ isOneToOne: false
       foreignKeyName: "sales_return_items_fulfillment_item_id_business_id_fkey"
       columns: ["fulfillment_item_id","business_id"]
 isOneToOne: false
+      referencedRelation: "report_sales_lines_view"
+      referencedColumns: ["fulfillment_item_id","business_id"]
+    },{
+      foreignKeyName: "sales_return_items_fulfillment_item_id_business_id_fkey"
+      columns: ["fulfillment_item_id","business_id"]
+isOneToOne: false
       referencedRelation: "sales_fulfillment_items"
       referencedColumns: ["id","business_id"]
     },{
@@ -1744,6 +1814,34 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"report_expenses_view": {
+                  Row: {
+                    "allocated_amount": number | null,"amount": number,"business_id": string,"category_id": string,"category_name": string,"classification": string,"cost_treatment": string,"created_at": string,"description": string,"expense_number": string,"id": string,"incurred_at": string,"is_voided": boolean,"operating_amount": number | null,"payment_method": Database["public"]['Enums']["payment_method"] | null,"payment_reference": string | null,"receipt_path": string | null,"supplier_id": string | null,"supplier_name": string | null,"unallocated_amount": number | null
+                  }
+                  ComputedFields: never
+                  Relationships: [
+                    {
+      foreignKeyName: "expenses_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"report_sales_lines_view": {
+                  Row: {
+                    "business_id": string,"channel_id": string,"channel_name": string,"cogs": number | null,"customer_id": string | null,"customer_name": string | null,"fulfillment_item_id": string,"lot_code": string,"net_revenue": number | null,"net_units": number | null,"order_id": string,"order_number": string,"ordered_at": string,"origins": string | null,"product_id": string,"product_name": string,"returned_units": number,"sku": string,"sold_at": string,"unit_cost_snapshot": number | null,"unit_price_snapshot": number | null,"units": number,"variant_id": string,"variant_name": string
+                  }
+                  ComputedFields: never
+                  Relationships: [
+                    {
+      foreignKeyName: "sales_fulfillment_items_business_id_fkey"
+      columns: ["business_id"]
+isOneToOne: false
+      referencedRelation: "businesses"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"roast_batch_summary_view": {
                   Row: {
                     "batch_number": string,"business_id": string,"coffee_names": string | null,"completed_at": string | null,"development_ratio_pct": number | null,"development_seconds": number | null,"first_crack_seconds": number | null,"green_cost": number | null,"green_weight_g": number,"id": string,"location_id": string,"location_name": string,"lot_codes": string | null,"lot_count": number | null,"operator_id": string | null,"operator_name": string | null,"production_cost_total": number | null,"profile_name": string | null,"roast_date": string,"roast_level": string | null,"roast_loss_pct": number | null,"roast_profile_id": string | null,"roast_yield_pct": number | null,"roasted_available_g": number | null,"roasted_cost_per_g": number | null,"roasted_cost_per_kg": number | null,"roasted_item_id": string | null,"roasted_on_hand_g": number | null,"roasted_reserved_g": number | null,"roasted_stock_value": number | null,"roasted_weight_g": number | null,"roaster_capacity_g": number,"roaster_id": string,"roaster_name": string,"started_at": string | null,"status": Database["public"]['Enums']["roast_batch_status"],"total_duration_seconds": number | null
@@ -1873,6 +1971,9 @@ isOneToOne: false
 "create_sales_return":
 { Args: { "p_idempotency_key": string,"p_items": Json,"p_location_id": string,"p_notes": string,"p_order_id": string,"p_reason": string,"p_received_at": string }; Returns: string
                            },
+"dashboard_metrics":
+{ Args: { "p_business_id": string,"p_from": string,"p_to": string }; Returns: Json
+                           },
 "fulfill_sales_order":
 { Args: { "p_fulfilled_at": string,"p_idempotency_key": string,"p_items": Json,"p_location_id": string,"p_notes": string,"p_order_id": string }; Returns: string
                            },
@@ -1895,6 +1996,36 @@ isOneToOne: false
                            },
 "release_inventory_reservation":
 { Args: { "p_reservation_id": string }; Returns: undefined
+                           },
+"report_expenses_by_category":
+{ Args: { "p_business_id": string,"p_from": string,"p_to": string }; Returns: {
+              "amount": number,"category": string,"classification": string,"cost_treatment": string,"operating_amount": number
+            }[]
+                           },
+"report_inventory_valuation":
+{ Args: { "p_business_id": string }; Returns: {
+              "item_type": Database["public"]['Enums']["inventory_item_type"],"items": number,"quantity": number,"value": number
+            }[]
+                           },
+"report_monthly_sales":
+{ Args: { "p_business_id": string,"p_from": string,"p_to": string }; Returns: {
+              "cogs": number,"gross_margin_pct": number,"gross_profit": number,"month": string,"net_sales": number,"units": number
+            }[]
+                           },
+"report_profitability":
+{ Args: { "p_business_id": string,"p_from": string,"p_to": string }; Returns: {
+              "cogs": number,"gross_margin_pct": number,"gross_profit": number,"net_sales": number,"operating_expenses": number,"operating_result": number,"orders": number,"refunds": number,"units_sold": number
+            }[]
+                           },
+"report_sales_by_dimension":
+{ Args: { "p_business_id": string,"p_dimension": string,"p_from": string,"p_to": string }; Returns: {
+              "cogs": number,"label": string,"net_sales": number,"units": number
+            }[]
+                           },
+"report_weekly_production":
+{ Args: { "p_business_id": string,"p_from": string,"p_to": string }; Returns: {
+              "batches": number,"cost_per_kg": number,"green_g": number,"loss_pct": number,"roasted_g": number,"week": string
+            }[]
                            },
 "reserve_inventory":
 { Args: { "p_idempotency_key": string,"p_inventory_item_id": string,"p_location_id": string,"p_quantity": number,"p_source_id": string,"p_source_type": string }; Returns: string

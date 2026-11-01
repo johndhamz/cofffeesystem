@@ -2,51 +2,45 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   BoxesIcon,
-  ConstructionIcon,
-  PackageSearchIcon,
-  ShoppingCartIcon,
+  FlameIcon,
+  PackageIcon,
+  ReceiptIcon,
   TriangleAlertIcon,
+  WalletIcon,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/shared/page-header";
 import { MetricCard } from "@/components/shared/metric-card";
+import { DateRangeFilter } from "@/components/shared/date-range-filter";
 import { formatWeight } from "@/lib/units";
 import { formatPHP, toCentavos } from "@/lib/money";
-import { getSessionContext, can } from "@/lib/auth/session";
-import {
-  getGreenInventoryDashboard,
-  parseInventoryFilter,
-} from "@/server/services/inventory.service";
-import { listPurchaseOrders } from "@/server/services/procurement.service";
+import { toManilaDateString } from "@/lib/units/time";
+import { getSessionContext } from "@/lib/auth/session";
 import { ROLE_LABELS } from "@/lib/permissions/policy";
+import { parseReportFilter } from "@/features/reports/schemas";
+import { getDashboardCharts, getDashboardMetrics } from "@/server/services/reports.service";
+import {
+  HorizontalBars,
+  MarginTrendChart,
+  MonthlySalesChart,
+  WeeklyRoastChart,
+  YieldTrendChart,
+} from "@/features/dashboard/components/dashboard-charts";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
-export default async function DashboardPage() {
-  const ctx = await getSessionContext();
-  const canInventory = can(ctx, "inventory.read");
-  const canPurchases = can(ctx, "purchases.read");
+const n = (v: unknown) => (typeof v === "number" ? v : 0);
 
-  const [inventory, openPurchases] = await Promise.all([
-    canInventory
-      ? getGreenInventoryDashboard({
-          ...parseInventoryFilter({}),
-          pageSize: 5,
-          sort: "available_g",
-          dir: "asc",
-        })
-      : null,
-    canPurchases
-      ? listPurchaseOrders({
-          page: 1,
-          pageSize: 5,
-          status: "confirmed",
-          dir: "desc",
-          sort: "ordered_at",
-        })
-      : null,
+export default async function DashboardPage({ searchParams }: PageProps<"/dashboard">) {
+  const filter = parseReportFilter(await searchParams, toManilaDateString());
+  const [ctx, m, charts] = await Promise.all([
+    getSessionContext(),
+    getDashboardMetrics(filter),
+    getDashboardCharts(filter),
   ]);
+  const finance = m.finance === true;
+  const alerts = n(m.low_stock_alerts) + n(m.low_material_alerts);
 
   return (
     <div className="space-y-6">
@@ -54,135 +48,209 @@ export default async function DashboardPage() {
         title={`Welcome, ${ctx?.profile.fullName?.split(" ")[0] ?? "there"}`}
         description={
           ctx?.business
-            ? `${ctx.business.businessName} · ${ROLE_LABELS[ctx.business.role]}`
+            ? `${ctx.business.businessName} · ${ROLE_LABELS[ctx.business.role]} · ${filter.from} to ${filter.to}`
             : undefined
         }
+        actions={<DateRangeFilter />}
       />
 
-      {inventory ? (
-        <section className="space-y-3" data-testid="inventory-summary">
-          <h2 className="text-sm font-semibold tracking-wide uppercase">Green coffee inventory</h2>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {finance ? (
+        <section className="space-y-3" data-testid="finance-metrics">
+          <h2 className="text-sm font-semibold tracking-wide uppercase">
+            Financial (management view)
+          </h2>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             <MetricCard
-              label="Available green"
-              value={formatWeight(inventory.summary.availableG)}
-              icon={<BoxesIcon className="size-5" />}
-              testId="metric-available"
+              label="Net sales"
+              value={formatPHP(toCentavos(n(m.net_sales)))}
+              hint={`${n(m.orders)} orders · ${n(m.units_sold)} units`}
+              icon={<ReceiptIcon className="size-5" />}
+              testId="metric-net-sales"
             />
             <MetricCard
-              label="Stock value"
-              value={formatPHP(toCentavos(inventory.summary.stockValue))}
-              hint="Lot-based actual cost"
-              testId="metric-value"
-            />
-            <MetricCard label="Active lots" value={inventory.summary.lots} testId="metric-lots" />
-            <MetricCard
-              label="Low / out of stock"
-              value={`${inventory.summary.lowStock} / ${inventory.summary.outOfStock}`}
-              tone={
-                inventory.summary.lowStock + inventory.summary.outOfStock > 0
-                  ? "warning"
-                  : "default"
+              label="Gross profit"
+              value={formatPHP(toCentavos(n(m.gross_profit)))}
+              hint={
+                m.gross_margin_pct !== null && m.gross_margin_pct !== undefined
+                  ? `${m.gross_margin_pct}% margin`
+                  : "no sales yet"
               }
-              icon={<TriangleAlertIcon className="size-5" />}
-              testId="metric-low"
+              testId="metric-gross-profit"
+            />
+            <MetricCard
+              label="Operating expenses"
+              value={formatPHP(toCentavos(n(m.operating_expenses)))}
+              icon={<WalletIcon className="size-5" />}
+              testId="metric-opex"
+            />
+            <MetricCard
+              label="Operating result"
+              value={formatPHP(toCentavos(n(m.operating_result)))}
+              tone={n(m.operating_result) < 0 ? "danger" : "success"}
+              testId="metric-operating-result"
+            />
+            <MetricCard
+              label="Receivables"
+              value={formatPHP(toCentavos(n(m.receivables)))}
+              hint={n(m.refunds) > 0 ? `refunds ${formatPHP(toCentavos(n(m.refunds)))}` : undefined}
+              tone={n(m.receivables) > 0 ? "warning" : "default"}
+              testId="metric-receivables"
             />
           </div>
         </section>
       ) : null}
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        {inventory ? (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Lowest stock lots</CardTitle>
-              <CardDescription>Lots with the least available weight.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {inventory.lots.rows.length === 0 ? (
-                <p className="text-muted-foreground text-sm">No green lots received yet.</p>
-              ) : (
-                <ul className="divide-y text-sm">
-                  {inventory.lots.rows.map((lot) => (
-                    <li key={lot.lot_id} className="flex items-center justify-between gap-3 py-2">
-                      <span className="min-w-0">
-                        <Link
-                          href={`/inventory/lots/${lot.lot_id}`}
-                          className="block truncate font-medium hover:underline"
-                        >
-                          {lot.coffee_name}
-                        </Link>
-                        <span className="text-muted-foreground block text-xs">{lot.lot_code}</span>
-                      </span>
-                      <span className="tabular-nums">{formatWeight(lot.available_g ?? 0)}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <Button asChild variant="link" className="mt-2 h-auto p-0">
-                <Link href="/inventory">Open inventory →</Link>
-              </Button>
-            </CardContent>
-          </Card>
+      <section className="space-y-3" data-testid="inventory-summary">
+        <h2 className="text-sm font-semibold tracking-wide uppercase">
+          Inventory &amp; production
+        </h2>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <MetricCard
+            label="Green coffee"
+            value={formatWeight(n(m.green_stock_g))}
+            hint={finance ? formatPHP(toCentavos(n(m.green_stock_value))) : undefined}
+            icon={<BoxesIcon className="size-5" />}
+            testId="metric-green"
+          />
+          <MetricCard
+            label="Roasted bulk"
+            value={formatWeight(n(m.roasted_stock_g))}
+            hint={finance ? formatPHP(toCentavos(n(m.roasted_stock_value))) : undefined}
+            icon={<FlameIcon className="size-5" />}
+            testId="metric-roasted"
+          />
+          <MetricCard
+            label="Finished goods"
+            value={`${n(m.finished_units)} units`}
+            hint={finance ? formatPHP(toCentavos(n(m.finished_stock_value))) : undefined}
+            icon={<PackageIcon className="size-5" />}
+            testId="metric-finished"
+          />
+          <MetricCard
+            label="Roasted output"
+            value={formatWeight(n(m.roasted_output_g))}
+            hint={`${n(m.roast_batches)} batches · avg loss ${m.avg_roast_loss_pct ?? "—"}%`}
+            testId="metric-output"
+          />
+          <MetricCard
+            label="Low-stock alerts"
+            value={alerts}
+            tone={alerts > 0 ? "warning" : "default"}
+            icon={<TriangleAlertIcon className="size-5" />}
+            hint={`${n(m.low_stock_alerts)} green lots · ${n(m.low_material_alerts)} materials`}
+            testId="metric-alerts"
+          />
+        </div>
+        {finance ? (
+          <p className="text-muted-foreground text-xs">
+            Inventory valuation{" "}
+            {formatPHP(
+              toCentavos(
+                n(m.green_stock_value) + n(m.roasted_stock_value) + n(m.finished_stock_value),
+              ),
+            )}{" "}
+            = remaining cost of all stock layers (lot-based actual cost).
+          </p>
         ) : null}
+      </section>
 
-        {openPurchases ? (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <ShoppingCartIcon className="size-4" /> Confirmed purchases awaiting receipt
-              </CardTitle>
-              <CardDescription>Stock increases only when a receipt is posted.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {openPurchases.rows.length === 0 ? (
-                <p className="text-muted-foreground text-sm">
-                  No purchases waiting to be received.
-                </p>
-              ) : (
-                <ul className="divide-y text-sm">
-                  {openPurchases.rows.map((po) => (
-                    <li key={po.id} className="flex items-center justify-between gap-3 py-2">
-                      <span className="min-w-0">
-                        <Link
-                          href={`/purchases/${po.id}`}
-                          className="block truncate font-medium hover:underline"
-                        >
-                          {po.purchase_number}
-                        </Link>
-                        <span className="text-muted-foreground block text-xs">
-                          {po.suppliers?.name}
-                        </span>
-                      </span>
-                      <span className="tabular-nums">{formatPHP(toCentavos(po.total))}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <Button asChild variant="link" className="mt-2 h-auto p-0">
-                <Link href="/purchases">Open purchases →</Link>
-              </Button>
-            </CardContent>
-          </Card>
+      <div className="grid gap-6 lg:grid-cols-2">
+        {finance ? (
+          <>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Monthly sales</CardTitle>
+                <CardDescription>Net sales vs gross profit, revenue on fulfilment.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <MonthlySalesChart data={charts.monthly} />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Gross margin trend</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <MarginTrendChart data={charts.monthly} />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Top products</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <HorizontalBars
+                  data={charts.topProducts.map((r) => ({ label: r.label, value: r.net_sales }))}
+                  valueKind="money"
+                  testId="chart-top-products"
+                />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Sales by origin</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <HorizontalBars
+                  data={charts.byOrigin.map((r) => ({ label: r.label, value: r.net_sales }))}
+                  valueKind="money"
+                  testId="chart-origin"
+                />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Expenses by category</CardTitle>
+                <CardDescription>
+                  Operating treatments only count toward the operating result.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <HorizontalBars
+                  data={charts.byCategory.map((r) => ({ label: r.category, value: r.amount }))}
+                  valueKind="money"
+                  testId="chart-expenses"
+                />
+              </CardContent>
+            </Card>
+          </>
         ) : null}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Weekly roast output</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <WeeklyRoastChart data={charts.weekly} />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Production yield trend</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <YieldTrendChart data={charts.weekly} />
+          </CardContent>
+        </Card>
       </div>
 
-      <Card className="border-dashed" data-testid="placeholder-notice">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <ConstructionIcon className="size-4" /> Placeholder: production, sales and financial
-            metrics
-          </CardTitle>
-          <CardDescription>
-            Roast yield, sales revenue, margins and expenses will appear here once their modules
-            ship (Phases 3–6). Nothing shown here is estimated or mocked — only live inventory and
-            purchasing data are displayed above.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="text-muted-foreground flex items-center gap-2 text-sm">
-          <PackageSearchIcon className="size-4" /> See docs/DEVELOPMENT_ROADMAP.md for the schedule.
-        </CardContent>
-      </Card>
+      <div className="flex flex-wrap gap-2">
+        <Button asChild variant="outline">
+          <Link href="/reports">Reports &amp; exports</Link>
+        </Button>
+        <Button asChild variant="outline">
+          <Link href="/inventory">Inventory</Link>
+        </Button>
+        {finance ? (
+          <Button asChild variant="outline">
+            <Link href="/expenses">Expenses</Link>
+          </Button>
+        ) : null}
+      </div>
+      {!finance ? (
+        <p className="text-muted-foreground text-xs" data-testid="finance-hidden">
+          Financial metrics are visible to owners only.
+        </p>
+      ) : null}
     </div>
   );
 }

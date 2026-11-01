@@ -13,9 +13,8 @@
 
 ## Placeholder content
 
-The following are intentionally placeholders with no business logic: the "production, sales and
-financial metrics" card on the dashboard and the Expenses and Reports pages. Inventory,
-purchasing, roasting, packaging and sales numbers are live.
+None remain. Every module through Phase 6 is live; the dashboard and reports read recorded cost
+snapshots and the inventory ledger. Phase 7 (members UI, MFA, PWA polish) is the next planned work.
 
 ## Ledger readiness for later phases
 

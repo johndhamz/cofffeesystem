@@ -33,7 +33,10 @@ movement history, viewer cannot adjust, receive 10 kg → roast 1.5 kg → 1.26 
 cannot create roasts; 1260 g batch → five 250 g bags → 10 g roasted left, 5 units, 45 bags left,
 lineage to roast + green lot, unit cost ₱159.87; five bags → order 3 for a customer → confirm (reserved
 lots shown) → fulfil → 2 left, COGS snapshot → GCash payment → Paid + Completed → customer history,
-printable document, sales history.
+printable document, sales history; dashboard metrics + date filter, expense with cost treatment and
+allocation, production/sales/profitability reports with filters, CSV and PDF exports (200, correct
+content types, `%PDF-` header), viewer locked out of financial reports/exports (403), anonymous export
+redirected/401.
 
 ## CI
 

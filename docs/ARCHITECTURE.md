@@ -56,3 +56,23 @@ from `business_members`. Tenant subscriptions are intentionally not modelled.
 - Master data is declared once in `src/features/settings/master-data/entities.ts` and drives
   list pages, dialogs, detail views, validation and the generic repository.
 - Test ids: use `data-testid` on interactive elements; Playwright selectors never depend on CSS.
+
+## Reporting model (Phase 6)
+
+- **Single costing system.** Reports never recompute costs: green lots carry purchase + landed cost,
+  roast batches snapshot production cost, packaging sessions snapshot unit cost, and each fulfilled
+  sales line snapshots `unit_cost_snapshot` (COGS) and `unit_price_snapshot` (revenue).
+- **Revenue recognition policy:** product sales are recognised when a fulfilment is posted (not on
+  order, not on payment). Payments and refunds settle receivables and never change revenue.
+- **Discounts & returns:** line and order discounts are prorated onto fulfilled units; returned units
+  reduce revenue; restocked returns credit COGS, quarantine/waste keep it.
+- **Each cost once:** `expenses.cost_treatment` decides recognition. Operating treatments (selling,
+  administrative, other operating) are period expenses; inventory acquisition, roast production and
+  packaging production are already inside inventory cost (COGS) and are excluded from operating
+  expenses; capital is an asset. `cost_allocations` link such expenses to the batch/session/receipt
+  for traceability only.
+- **Formulas:** gross profit = net sales − COGS; gross margin = GP / net sales; operating result = GP −
+  operating expenses. Inventory valuation = Σ remaining cost layers (reconciles to balances).
+- **Performance:** aggregations run in SQL (`report_*` functions, indexed by business + date); report
+  pages paginate (50 rows) and exports stream up to 10,000 rows server-side. Date ranges are inclusive
+  calendar days in Asia/Manila. These are management reports, not statutory financial statements.
