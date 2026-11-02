@@ -67,6 +67,6 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     // Everything except Next internals, static assets and API health.
-    "/((?!_next/static|_next/image|favicon.ico|icons/|sw.js|manifest.webmanifest|offline|api/health|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|icons/|templates/|sw.js|manifest.webmanifest|offline|api/health|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };
