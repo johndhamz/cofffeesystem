@@ -86,6 +86,7 @@ export function MetricCard({
   testId,
 }: MetricCardProps) {
   const a = ACCENT[accent];
+  const long = typeof value === "string" && value.length > 11;
   const body = (
     <Card
       className={cn(
@@ -103,7 +104,10 @@ export function MetricCard({
             {label}
           </p>
           <p
-            className="truncate text-2xl font-semibold tabular-nums"
+            className={cn(
+              "font-semibold tracking-tight tabular-nums",
+              long ? "text-xl break-words" : "text-2xl",
+            )}
             data-testid={testId ? `${testId}-value` : undefined}
           >
             {value}
@@ -113,7 +117,12 @@ export function MetricCard({
         </div>
         <div className="flex shrink-0 flex-col items-end gap-2">
           {icon ? (
-            <span className={cn("flex size-9 items-center justify-center rounded-md", a.icon)}>
+            <span
+              className={cn(
+                "flex size-8 items-center justify-center rounded-md [&_svg]:size-4",
+                a.icon,
+              )}
+            >
               {icon}
             </span>
           ) : null}

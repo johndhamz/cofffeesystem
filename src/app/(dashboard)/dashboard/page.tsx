@@ -123,7 +123,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
             <span className="bg-chart-1 size-2 rounded-full" aria-hidden /> Financial (management
             view)
           </h2>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             <MetricCard
               label="Net sales"
               value={formatPHP(toCentavos(n(m.net_sales)))}
@@ -189,7 +189,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
         <h2 className="flex items-center gap-2 text-sm font-semibold tracking-wide uppercase">
           <span className="bg-chart-6 size-2 rounded-full" aria-hidden /> Inventory &amp; production
         </h2>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           <MetricCard
             label="Green coffee"
             value={formatWeight(n(m.green_stock_g), { maxFractionDigits: 1 })}
