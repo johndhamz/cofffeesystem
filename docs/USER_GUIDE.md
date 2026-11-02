@@ -117,6 +117,13 @@ receipt photo. Owners can _Allocate_ an expense to the batch or session it belon
 
 ## Dashboard and reports
 
+The dashboard opens on the current month. Use the preset buttons (Today, 7 / 30 / 90 days, This
+month, This year) or the From/To dates to change the period; every number and chart follows it.
+Owners see financial cards with the change versus the previous period of the same length (green
+when the direction is good, red when it is not). Every card is a link to its detail page, chart
+legends can be clicked to hide a series, hovering shows exact values, and bars in Top products and
+Expenses by category open the matching list.
+
 The dashboard shows stock, production and (for owners) net sales, gross profit, operating
 expenses, receivables and charts for the selected dates. **Reports** offers production, green
 inventory, finished goods, sales, expenses and profitability, each filterable and exportable to CSV

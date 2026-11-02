@@ -18,7 +18,7 @@ test.describe(
       await expect(page.getByTestId("metric-alerts")).toBeVisible();
       await page.getByTestId("date-range-filter").locator("#from").fill("2026-01-01");
       await expect(page).toHaveURL(/from=2026-01-01/);
-      await expect(page.getByTestId("page-title").locator("..")).toContainText("2026-01-01");
+      await expect(page.getByTestId("page-title").locator("..")).toContainText("01 Jan 2026");
       await expect(
         page
           .getByTestId("chart-weekly-roast")
