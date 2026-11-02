@@ -6,9 +6,9 @@ Three automated layers plus manual UAT, all runnable locally and in CI:
 
 | Layer       | Tool                                               | Count (2026-11-01) | What it proves                                                                                                                                  |
 | ----------- | -------------------------------------------------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| Unit        | Vitest (jsdom)                                     | 76                 | money/weight/time arithmetic, Zod schemas, permission policy, error mapping, calculations for roast/packaging/sales/finance, display components |
-| Integration | Vitest (node) against local Supabase as real users | 103 (10 files)     | RLS, functions, idempotency, concurrency, reversals, costing, reporting reconciliation, global invariants, security                             |
-| End-to-end  | Playwright (Chromium, POM, tags)                   | 66 (13 specs)      | real UI flows per role, the full business scenario, negative paths, security headers/redirects, invitations by email, MFA sign-in, PWA assets   |
+| Unit        | Vitest (jsdom)                                     | 82                 | money/weight/time arithmetic, Zod schemas, permission policy, error mapping, calculations for roast/packaging/sales/finance, display components |
+| Integration | Vitest (node) against local Supabase as real users | 106 (11 files)     | RLS, functions, idempotency, concurrency, reversals, costing, reporting reconciliation, global invariants, security                             |
+| End-to-end  | Playwright (Chromium, POM, tags)                   | 67 (14 specs)      | real UI flows per role, the full business scenario, negative paths, security headers/redirects, invitations by email, MFA sign-in, PWA assets   |
 | Manual      | `docs/UAT_CHECKLIST.md`                            | 66 items           | business sign-off on staging                                                                                                                    |
 
 Flakiness policy: **retries are disabled**. Every wait is state-based (`expect(...).toBe…`,

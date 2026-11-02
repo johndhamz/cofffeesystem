@@ -5,21 +5,22 @@ single business; each lists the workaround.
 
 ## Functional
 
-| Area       | Limitation                                                                                                                | Workaround / plan                                                                   |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| Members    | Invitations go by email only; there is no link-copy fallback if the email provider is down.                               | Resend from Settings → Team members, or use _Forgot password_ on the sign-in page.  |
-| Auth       | MFA has no backup/recovery codes; rate limiting stays at Supabase Auth defaults.                                          | A lost authenticator is removed by an owner via the admin process in `SECURITY.md`. |
-| Purchasing | Over-receipt beyond the ordered quantity is rejected (no tolerance).                                                      | Amend the draft PO before confirming, or raise a second PO.                         |
-| Purchasing | PO-level additional costs are allocated by ordered weight at each receipt; a cancelled remainder leaves part unallocated. | Record remaining freight as an expense with `inventory_acquisition` treatment.      |
-| Roasting   | Artisan `.alog`/CSV files are stored but not parsed; measurements are entered manually.                                   | Later phase.                                                                        |
-| Roasting   | A completed roast can only be voided while none of its roasted coffee has been used.                                      | Use an inventory adjustment for partial corrections.                                |
-| Packaging  | Surplus roasted input beyond Σ outputs is absorbed into unit cost (no explicit "packing loss" line).                      | Enter exact input weight; the preview shows remaining grams.                        |
-| Sales      | One location per order fulfilment; no multi-warehouse transfers UI (`transfer_*` movement types exist).                   | Single-site roastery for now.                                                       |
-| Sales      | Returns can only be posted with a disposition; there is no "pending inspection" state.                                    | Record the return once inspected.                                                   |
-| Finance    | Management reporting only (no VAT/BIR statutory statements, no accounts payable ledger).                                  | Export CSV to the accountant.                                                       |
-| Finance    | Operating expenses are recognised when incurred (cash-basis style); no accruals/prepayments.                              | Document in the expense notes.                                                      |
-| Reports    | Exports are capped at 10,000 rows per file.                                                                               | Narrow the date range.                                                              |
-| Currency   | PHP only; timezone Asia/Manila only (both validated).                                                                     | By design for this business.                                                        |
+| Area       | Limitation                                                                                                                                 | Workaround / plan                                                                   |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| Members    | Invitations go by email only; there is no link-copy fallback if the email provider is down.                                                | Resend from Settings → Team members, or use _Forgot password_ on the sign-in page.  |
+| Auth       | MFA has no backup/recovery codes; rate limiting stays at Supabase Auth defaults.                                                           | A lost authenticator is removed by an owner via the admin process in `SECURITY.md`. |
+| Purchasing | Over-receipt beyond the ordered quantity is rejected (no tolerance).                                                                       | Amend the draft PO before confirming, or raise a second PO.                         |
+| Purchasing | PO-level additional costs are allocated by ordered weight at each receipt; a cancelled remainder leaves part unallocated.                  | Record remaining freight as an expense with `inventory_acquisition` treatment.      |
+| Roasting   | Artisan `.alog`/CSV files are stored but not parsed; measurements are entered manually.                                                    | Later phase.                                                                        |
+| Sales      | The history import creates orders only (no past purchases, roasts or expenses); opening stock is costed from the "Unit cost" column or ₱0. | Enter past expenses in Expenses; start purchasing/roasting from go-live.            |
+| Roasting   | A completed roast can only be voided while none of its roasted coffee has been used.                                                       | Use an inventory adjustment for partial corrections.                                |
+| Packaging  | Surplus roasted input beyond Σ outputs is absorbed into unit cost (no explicit "packing loss" line).                                       | Enter exact input weight; the preview shows remaining grams.                        |
+| Sales      | One location per order fulfilment; no multi-warehouse transfers UI (`transfer_*` movement types exist).                                    | Single-site roastery for now.                                                       |
+| Sales      | Returns can only be posted with a disposition; there is no "pending inspection" state.                                                     | Record the return once inspected.                                                   |
+| Finance    | Management reporting only (no VAT/BIR statutory statements, no accounts payable ledger).                                                   | Export CSV to the accountant.                                                       |
+| Finance    | Operating expenses are recognised when incurred (cash-basis style); no accruals/prepayments.                                               | Document in the expense notes.                                                      |
+| Reports    | Exports are capped at 10,000 rows per file.                                                                                                | Narrow the date range.                                                              |
+| Currency   | PHP only; timezone Asia/Manila only (both validated).                                                                                      | By design for this business.                                                        |
 
 ## Technical
 

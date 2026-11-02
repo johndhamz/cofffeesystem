@@ -465,12 +465,22 @@ describe("inventory invariants (whole database)", () => {
         (l) => (l.roast_batch_numbers ?? "").length > 0 && (l.green_lot_codes ?? "").length > 0,
       ),
     ).toBe(true);
+    // Lots without a packaging session exist only as opening stock from the sales-history import:
+    // coded OPEN-… and backed by an 'adjustment' movement that carries their cost.
     const { data: orphans } = await admin
       .from("finished_goods_lots")
-      .select("id")
+      .select("id, lot_code")
       .eq("business_id", businessId)
       .is("packaging_session_id", null);
-    expect(orphans).toEqual([]);
+    expect(orphans!.filter((l) => !l.lot_code.startsWith("OPEN-"))).toEqual([]);
+    for (const lot of orphans ?? []) {
+      const { data: mv } = await admin
+        .from("inventory_movements")
+        .select("movement_type, source_type")
+        .eq("source_id", lot.id)
+        .eq("source_type", "opening_finished_lot");
+      expect(mv).toEqual([{ movement_type: "adjustment", source_type: "opening_finished_lot" }]);
+    }
   });
 
   it("documents that moved stock are immutable; reversals are explicit", async () => {

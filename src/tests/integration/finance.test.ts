@@ -24,7 +24,7 @@ let locationId: string;
 let channelId: string;
 let categoryId: string;
 
-const DAY = "2026-11-01";
+const DAY = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Manila" }); // today in Manila
 
 beforeAll(async () => {
   [owner, viewer, sales, other] = await Promise.all([

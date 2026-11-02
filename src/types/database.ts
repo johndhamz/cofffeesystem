@@ -2003,6 +2003,9 @@ isOneToOne: false
 "fulfill_sales_order":
 { Args: { "p_fulfilled_at": string,"p_idempotency_key": string,"p_items": Json,"p_location_id": string,"p_notes": string,"p_order_id": string }; Returns: string
                            },
+"import_sales_history":
+{ Args: { "p_batch_key": string,"p_business_id": string,"p_location_id": string,"p_opening": Json,"p_orders": Json }; Returns: Json
+                           },
 "issue_refund":
 { Args: { "p_amount": number,"p_idempotency_key": string,"p_method": string,"p_payment_id": string,"p_reason": string }; Returns: string
                            },

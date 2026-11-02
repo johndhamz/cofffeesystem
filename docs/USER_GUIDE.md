@@ -98,6 +98,16 @@ records instead of deleting them; history is kept.
    _waste_ keeps it out of stock.
 5. **Print** gives a customer-facing document.
 
+## Importing past sales (owner)
+
+Sales → **Import history** brings sales made before you started using the system into the reports.
+Download the Excel template, fill one row per product sold (date, channel, product, variant,
+quantity, unit price, and ideally the unit cost), then upload it. The screen shows every order it
+will create and any row it cannot understand; nothing is saved until you press **Import**. Each
+import creates opening stock for the units sold (dated at the first sale, so your current stock is
+untouched), fulfils the orders on their original dates, and records payments for rows marked paid.
+Uploading the same file twice never duplicates orders.
+
 ## Expenses (owner, sales staff for their own)
 
 **Expenses → Record expense** with a category and a _cost treatment_. Choose _Roast production_ or

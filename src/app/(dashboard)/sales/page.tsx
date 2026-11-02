@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { HistoryIcon, PlusIcon, ReceiptIcon, UsersIcon } from "lucide-react";
+import { HistoryIcon, PlusIcon, ReceiptIcon, UsersIcon, UploadIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/shared/page-header";
 import { MetricCard } from "@/components/shared/metric-card";
@@ -31,6 +31,7 @@ export default async function SalesPage({ searchParams }: PageProps<"/sales">) {
     getSalesSummary(),
   ]);
   const canManage = can(ctx, "sales.manage");
+  const canImport = canManage && can(ctx, "inventory.adjust");
   const createButton = canManage ? (
     <Button asChild data-testid="create-button">
       <Link href="/sales/new">
@@ -59,6 +60,13 @@ export default async function SalesPage({ searchParams }: PageProps<"/sales">) {
                 <HistoryIcon /> History
               </Link>
             </Button>
+            {canImport ? (
+              <Button asChild variant="outline" data-testid="import-link">
+                <Link href="/sales/import">
+                  <UploadIcon /> Import history
+                </Link>
+              </Button>
+            ) : null}
             {createButton}
           </>
         }

@@ -17,6 +17,7 @@ production).
 | `20261101000007_finance.sql`               | Expenses, cost allocations, `finance.read`/`expenses.allocate` permissions, report views and functions, `dashboard_metrics`, bucket `expense-receipts`                                                                                              |
 | `20261101000008_hardening.sql`             | Security review fixes: column guards on documents/snapshots, immutable `audit_logs`, reservation permissions, `app.require_any_permission`                                                                                                          |
 | `20261101000009_members_mfa.sql`           | `business_members.invited_at/accepted_at`, `business_settings.require_mfa`, membership guard (no business/user reassignment, last active owner protected), `auth.users` sign-in trigger that stamps `accepted_at`, `business_member_directory_view` |
+| `20261102000010_sales_history_import.sql`  | `import_sales_history()`: opening finished-goods lots + backdated, fulfilled, paid orders from a spreadsheet in one transaction (idempotent per batch key)                                                                                          |
 
 ## Conventions
 

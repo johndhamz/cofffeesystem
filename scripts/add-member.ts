@@ -80,14 +80,12 @@ async function main() {
     if (error) throw error;
     console.log(`membership updated: role=${role}, active`);
   } else {
-    const { error } = await admin
-      .from("business_members")
-      .insert({
-        business_id: businessId,
-        user_id: user.id,
-        role,
-        invited_at: new Date().toISOString(),
-      });
+    const { error } = await admin.from("business_members").insert({
+      business_id: businessId,
+      user_id: user.id,
+      role,
+      invited_at: new Date().toISOString(),
+    });
     if (error) throw error;
     console.log(`membership created: role=${role}`);
   }
