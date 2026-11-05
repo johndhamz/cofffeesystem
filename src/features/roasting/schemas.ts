@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { parseMinutesToSeconds } from "@/lib/roasting/calculations";
 import { dateString, optionalTrimmed, optionalUuid, uuidSchema } from "@/lib/validation/common";
 
 export const ROAST_STATUS_LABELS = {
@@ -34,12 +35,6 @@ const optionalDecimal = (schema: z.ZodNumber) =>
   z.preprocess(
     (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
     schema.optional(),
-  );
-
-const optionalInt = (schema: z.ZodNumber) =>
-  z.preprocess(
-    (v) => (v === "" || v === null || v === undefined ? undefined : Number(v)),
-    schema.int("Use whole numbers").optional(),
   );
 
 export const roastInputSchema = z.object({
@@ -110,11 +105,36 @@ export const roastCompletionSchema = z
       (v) => (v === "" ? undefined : v),
       z.enum(["light", "medium_light", "medium", "medium_dark", "dark"]).optional(),
     ),
-    total_duration_seconds: z.coerce
-      .number({ error: "Enter the roast duration" })
-      .int()
-      .positive("Duration must be greater than zero"),
-    first_crack_seconds: optionalInt(z.number().min(0, "Cannot be negative")),
+    // Entered in minutes ("10:30", "10.5" or "10m 30s"); stored as whole seconds.
+    total_duration_seconds: z.preprocess(
+      (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
+      z
+        .union([z.string(), z.number()], { error: "Enter the roast duration in minutes" })
+        .transform((v, ctx) => {
+          const s = parseMinutesToSeconds(v);
+          if (s === null) {
+            ctx.addIssue({ code: "custom", message: "Enter minutes, e.g. 10:30 or 10.5" });
+            return z.NEVER;
+          }
+          return s;
+        })
+        .pipe(z.number().int().positive("Duration must be greater than zero")),
+    ),
+    first_crack_seconds: z.preprocess(
+      (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
+      z
+        .union([z.string(), z.number()])
+        .transform((v, ctx) => {
+          const s = parseMinutesToSeconds(v);
+          if (s === null) {
+            ctx.addIssue({ code: "custom", message: "Enter minutes, e.g. 8:00 or 8" });
+            return z.NEVER;
+          }
+          return s;
+        })
+        .pipe(z.number().int().min(0, "Cannot be negative"))
+        .optional(),
+    ),
     charge_bt_c: optionalDecimal(z.number().min(-50).max(400)),
     charge_et_c: optionalDecimal(z.number().min(-50).max(500)),
     first_crack_bt_c: optionalDecimal(z.number().min(-50).max(400)),

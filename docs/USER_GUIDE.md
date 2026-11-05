@@ -56,6 +56,9 @@ records instead of deleting them; history is kept.
 
 ## Roasting
 
+Durations are entered in minutes: type `10:30` (minutes:seconds), `10.5` or `10m 30s`; the form
+shows the exact seconds it will save under the field. First crack is also in minutes from charge.
+
 1. **Roast Production → New roast**: choose the roaster, location, one or more green lots and
    the grams of each. A warning shows if you exceed the roaster's capacity (the Yoshan DY-2kg is
    2,000 g).

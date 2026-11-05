@@ -51,9 +51,12 @@ export class RoastingPage {
     await this.completeLink().click();
     await this.completionForm().waitFor();
     await this.page.getByTestId("input-roasted-weight").fill(values.roastedG);
-    await this.page.getByTestId("input-duration").fill(values.durationS);
+    // the form takes minutes (m:ss); specs keep speaking in seconds
+    const mmss = (sec: string) =>
+      `${Math.floor(Number(sec) / 60)}:${String(Number(sec) % 60).padStart(2, "0")}`;
+    await this.page.getByTestId("input-duration").fill(mmss(values.durationS));
     if (values.firstCrackS)
-      await this.page.getByTestId("input-first-crack").fill(values.firstCrackS);
+      await this.page.getByTestId("input-first-crack").fill(mmss(values.firstCrackS));
     if (values.lpg) await this.page.getByTestId("input-cost-amount").first().fill(values.lpg);
     await this.completeSubmit().click();
     await this.page.waitForURL(/\/roasting\/[0-9a-f-]+$/);

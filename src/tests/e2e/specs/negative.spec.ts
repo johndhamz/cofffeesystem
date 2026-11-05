@@ -33,7 +33,7 @@ test.describe("negative paths", { tag: ["@regression", "@security"] }, () => {
     await roasting.createDraft();
     await page.getByTestId("complete-link").click();
     await page.getByTestId("input-roasted-weight").fill("2000"); // > green
-    await page.getByTestId("input-duration").fill("600");
+    await page.getByTestId("input-duration").fill("10:00");
     await page.getByTestId("complete-submit").click();
     await expect(
       page

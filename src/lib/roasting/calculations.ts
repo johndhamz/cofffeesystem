@@ -121,6 +121,29 @@ export function rateOfRise(
   return Math.round(((curr.btC - prev.btC) * 60 * 1000) / dt) / 1000;
 }
 
+/**
+ * Parses a duration typed in minutes into whole seconds. Accepts "10" / "10.5" (minutes),
+ * "10:30" (mm:ss) and "10m 30s". Returns null when the text is not a duration.
+ */
+export function parseMinutesToSeconds(input: string | number | null | undefined): number | null {
+  if (input === null || input === undefined) return null;
+  if (typeof input === "number") return Number.isFinite(input) ? Math.round(input * 60) : null;
+  const text = input.trim().toLowerCase().replace(/\s+/g, "");
+  if (text === "") return null;
+  let m = /^(\d+):([0-5]?\d)$/.exec(text);
+  if (m) return Number(m[1]) * 60 + Number(m[2]);
+  m = /^(?:(\d+(?:\.\d+)?)m(?:in)?)?(?:(\d+)s(?:ec)?)?$/.exec(text);
+  if (m && (m[1] || m[2])) return Math.round(Number(m[1] ?? 0) * 60) + Number(m[2] ?? 0);
+  if (/^\d+(\.\d+)?$/.test(text)) return Math.round(Number(text) * 60);
+  return null;
+}
+
+/** Seconds → "m:ss" for editing (the inverse of parseMinutesToSeconds). */
+export function secondsToMinutesText(seconds: number | null | undefined): string {
+  if (seconds === null || seconds === undefined || !Number.isFinite(seconds)) return "";
+  return formatDuration(Math.round(seconds));
+}
+
 export function formatDuration(seconds: number | null | undefined): string {
   if (seconds === null || seconds === undefined) return "—";
   const m = Math.floor(seconds / 60);

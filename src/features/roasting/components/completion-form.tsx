@@ -24,6 +24,8 @@ import {
   roastYieldPct,
   roastedCostPerKgCentavos,
   ROAST_LEVELS,
+  parseMinutesToSeconds,
+  secondsToMinutesText,
 } from "@/lib/roasting/calculations";
 import { COST_TYPES, roastCompletionSchema, type RoastCompletionInput } from "../schemas";
 import { completeRoastBatchAction } from "../actions";
@@ -44,6 +46,12 @@ interface Props {
   };
 }
 
+/** Shows the parsed value ("10:30 = 630 s") so the roaster sees exactly what will be saved. */
+function durationHint(raw: string | undefined, fallback: string): string {
+  const seconds = parseMinutesToSeconds(raw ?? "");
+  return seconds === null ? fallback : `${formatDuration(seconds)} = ${seconds} s`;
+}
+
 export function RoastCompletionForm({
   batchId,
   batchNumber,
@@ -60,8 +68,10 @@ export function RoastCompletionForm({
     defaultValues: {
       roasted_weight_g: "" as unknown as number,
       roast_level: (defaults.roast_level ?? "") as FormValues["roast_level"],
-      total_duration_seconds: (defaults.total_duration_seconds ?? "") as unknown as number,
-      first_crack_seconds: (defaults.first_crack_seconds ?? "") as unknown as number,
+      total_duration_seconds: secondsToMinutesText(
+        defaults.total_duration_seconds,
+      ) as unknown as number,
+      first_crack_seconds: secondsToMinutesText(defaults.first_crack_seconds) as unknown as number,
       charge_bt_c: "" as unknown as number,
       charge_et_c: "" as unknown as number,
       first_crack_bt_c: "" as unknown as number,
@@ -82,11 +92,8 @@ export function RoastCompletionForm({
 
   const preview = useMemo(() => {
     const roasted = Number(w.roasted_weight_g);
-    const duration = Number(w.total_duration_seconds);
-    const fc =
-      w.first_crack_seconds === "" || w.first_crack_seconds === undefined
-        ? null
-        : Number(w.first_crack_seconds);
+    const duration = parseMinutesToSeconds(w.total_duration_seconds as unknown as string) ?? NaN;
+    const fc = parseMinutesToSeconds(w.first_crack_seconds as unknown as string);
     const validWeights = Number.isInteger(roasted) && roasted > 0 && roasted <= greenWeightG;
     let other = 0;
     for (const c of w.costs ?? []) {
@@ -194,33 +201,35 @@ export function RoastCompletionForm({
           </FormField>
           <FormField
             name="total_duration_seconds"
-            label="Total duration (s)"
+            label="Total duration (min)"
             error={errors.total_duration_seconds?.message}
             required
-            description={
-              w.total_duration_seconds
-                ? formatDuration(Number(w.total_duration_seconds))
-                : undefined
-            }
+            description={durationHint(
+              w.total_duration_seconds as unknown as string,
+              "Minutes, e.g. 10:30 or 10.5",
+            )}
           >
             <Input
               id="total_duration_seconds"
-              inputMode="numeric"
-              placeholder="600"
+              inputMode="decimal"
+              placeholder="10:30"
               data-testid="input-duration"
               {...form.register("total_duration_seconds")}
             />
           </FormField>
           <FormField
             name="first_crack_seconds"
-            label="First crack (s)"
+            label="First crack (min)"
             error={errors.first_crack_seconds?.message}
-            description="Optional"
+            description={durationHint(
+              w.first_crack_seconds as unknown as string,
+              "Optional, minutes from charge",
+            )}
           >
             <Input
               id="first_crack_seconds"
-              inputMode="numeric"
-              placeholder="480"
+              inputMode="decimal"
+              placeholder="8:00"
               data-testid="input-first-crack"
               {...form.register("first_crack_seconds")}
             />
