@@ -42,3 +42,54 @@ describe("duration entry in minutes", () => {
     if (!nonsense.success) expect(nonsense.error.issues[0]?.message).toMatch(/minutes/i);
   });
 });
+
+describe("LPG cost estimate from duration", () => {
+  it("uses hours x kg/h at the fixed profile x price per kg, rounded to centavos", async () => {
+    const { estimateLpgCost } = await import("@/lib/roasting/calculations");
+    // 10 min at 0.2 kg/h = 0.0333 kg; x PHP 127/kg = PHP 4.2333 -> 4.23
+    const e = estimateLpgCost({ durationSeconds: 600, kgPerHour: 0.2, pricePerKg: 127 });
+    expect(e?.kg).toBeCloseTo(0.0333, 4);
+    expect(e?.centavos).toBe(423);
+    expect(e?.amount).toBe("4.23");
+    // 9:30 (the standard profile) -> 0.0317 kg -> PHP 4.02
+    expect(estimateLpgCost({ durationSeconds: 570, kgPerHour: 0.2, pricePerKg: 127 })?.amount).toBe(
+      "4.02",
+    );
+  });
+
+  it("returns null when disabled or when the duration is missing", async () => {
+    const { estimateLpgCost } = await import("@/lib/roasting/calculations");
+    expect(estimateLpgCost({ durationSeconds: 600, kgPerHour: 0, pricePerKg: 127 })).toBeNull();
+    expect(estimateLpgCost({ durationSeconds: 600, kgPerHour: 0.2, pricePerKg: 0 })).toBeNull();
+    expect(estimateLpgCost({ durationSeconds: null, kgPerHour: 0.2, pricePerKg: 127 })).toBeNull();
+    expect(estimateLpgCost({ durationSeconds: 0, kgPerHour: 0.2, pricePerKg: 127 })).toBeNull();
+    expect(estimateLpgCost({ durationSeconds: NaN, kgPerHour: 0.2, pricePerKg: 127 })).toBeNull();
+  });
+
+  it("settings schema accepts decimal text and rejects negatives or too many decimals", async () => {
+    const { businessSettingsSchema } = await import("@/features/settings/schemas");
+    const base = {
+      business_name: "Alamat",
+      currency: "PHP",
+      timezone: "Asia/Manila",
+      inventory_weight_unit: "g",
+      costing_method: "lot_actual",
+      default_roaster_id: "",
+      default_location_id: "",
+      require_mfa: false,
+    };
+    const ok = businessSettingsSchema.parse({
+      ...base,
+      lpg_price_per_kg: "127.50",
+      lpg_kg_per_hour: "0.2",
+      lpg_profile_avg_kpa: 1.9,
+    });
+    expect(ok.lpg_price_per_kg).toBe(127.5);
+    expect(ok.lpg_kg_per_hour).toBe(0.2);
+    expect(ok.lpg_profile_avg_kpa).toBe(1.9);
+    expect(businessSettingsSchema.safeParse({ ...ok, lpg_kg_per_hour: "-1" }).success).toBe(false);
+    expect(businessSettingsSchema.safeParse({ ...ok, lpg_price_per_kg: "1.234" }).success).toBe(
+      false,
+    );
+  });
+});

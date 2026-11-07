@@ -195,6 +195,22 @@ describe("cross-business references", () => {
     expect(result.error?.code).toBe("23503");
   });
 
+  it("LPG estimate settings default to the Yoshan DY-2 / Nov 2026 calibration and reject negatives", async () => {
+    const { data } = await owner
+      .from("business_settings")
+      .select("lpg_price_per_kg, lpg_kg_per_hour, lpg_profile_avg_kpa")
+      .eq("business_id", businessId)
+      .single();
+    expect(Number(data!.lpg_price_per_kg)).toBeGreaterThan(0);
+    expect(Number(data!.lpg_kg_per_hour)).toBeGreaterThan(0);
+    expect(Number(data!.lpg_profile_avg_kpa)).toBeGreaterThan(0);
+    const bad = await owner
+      .from("business_settings")
+      .update({ lpg_kg_per_hour: -0.1 })
+      .eq("business_id", businessId);
+    expect(bad.error?.code).toBe("23514");
+  });
+
   it("accepts the business's own roaster as default and records who changed it", async () => {
     const { data: own } = await owner
       .from("roasters")

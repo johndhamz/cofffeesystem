@@ -41,8 +41,11 @@ offline page; nothing is saved offline, so reconnect and try again.
 
 ## Settings (owner)
 
-Settings → Business: name, default roaster and default location, and whether two-factor
-authentication is required. Settings → Suppliers / Roasters /
+Settings → Business: name, default roaster and default location, whether two-factor
+authentication is required, and the **LPG cost estimate** calibration: LPG use in kg per hour at
+your standard gas profile (Yoshan DY-2 listings quote about 0.2), the LPG price per kg (the 11 kg
+tank price divided by 11), and the profile's average gas pressure in kPa for the breakdown. Set
+LPG use to 0 to turn the pre-fill off. Settings → Suppliers / Roasters /
 Locations / Expense categories / Sales channels, and Green Coffee for the coffee catalog. Deactivate
 records instead of deleting them; history is kept.
 
@@ -66,7 +69,10 @@ shows the exact seconds it will save under the field. First crack is also in min
    drum) and events (first crack, drop). The curve chart updates as you add readings. **Upload
    attachment** adds an Artisan log or a screenshot; it uploads as soon as you pick the file.
 3. **Complete roast**: roasted output grams, roast level, duration, first-crack time and the
-   LPG/labor costs. The screen previews loss %, yield % and cost per roasted kg. Completing consumes
+   LPG/labor costs. The LPG / fuel line is pre-filled from the total duration using your standard
+   gas profile (see Settings → LPG cost estimate) and shows its working underneath; type over it if
+   you know the real figure, or press _Use estimate_ to go back. The screen previews loss %, yield
+   % and cost per roasted kg. Completing consumes
    the green lots and creates roasted bulk stock in one step. Mistake? **Void** reverses it while
    the roasted coffee is still untouched.
 

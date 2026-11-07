@@ -14,6 +14,7 @@ import { FormField } from "@/components/shared/form-field";
 import {
   businessSettingsSchema,
   COSTING_METHOD_LABELS,
+  LPG_DEFAULTS,
   SUPPORTED_CURRENCIES,
   SUPPORTED_TIMEZONES,
   type BusinessSettingsInput,
@@ -50,6 +51,13 @@ export function BusinessSettingsForm({
       default_roaster_id: settings.default_roaster_id ?? "",
       default_location_id: settings.default_location_id ?? "",
       require_mfa: settings.require_mfa,
+      lpg_price_per_kg: Number(settings.lpg_price_per_kg ?? LPG_DEFAULTS.lpg_price_per_kg).toFixed(
+        2,
+      ),
+      lpg_kg_per_hour: Number(settings.lpg_kg_per_hour ?? LPG_DEFAULTS.lpg_kg_per_hour).toFixed(3),
+      lpg_profile_avg_kpa: Number(
+        settings.lpg_profile_avg_kpa ?? LPG_DEFAULTS.lpg_profile_avg_kpa,
+      ).toFixed(2),
     },
   });
   const errors = form.formState.errors;
@@ -201,6 +209,57 @@ export function BusinessSettingsForm({
           <option value="true">Required for all members</option>
         </NativeSelect>
       </FormField>
+      <fieldset className="space-y-3 rounded-lg border p-4" data-testid="lpg-settings">
+        <legend className="px-1 text-sm font-medium">LPG cost estimate</legend>
+        <p className="text-muted-foreground text-sm">
+          When a roast is completed, the LPG / fuel cost is pre-filled from the total duration using
+          your standard gas profile. Set LPG use to 0 to turn the estimate off.
+        </p>
+        <div className="grid gap-4 sm:grid-cols-3">
+          <FormField
+            name="lpg_kg_per_hour"
+            label="LPG use (kg per hour)"
+            error={errors.lpg_kg_per_hour?.message}
+            description="At your standard profile. Yoshan DY-2 listings quote about 0.200."
+          >
+            <Input
+              id="lpg_kg_per_hour"
+              inputMode="decimal"
+              disabled={disabled}
+              data-testid="input-lpg_kg_per_hour"
+              {...form.register("lpg_kg_per_hour")}
+            />
+          </FormField>
+          <FormField
+            name="lpg_price_per_kg"
+            label="LPG price (₱ per kg)"
+            error={errors.lpg_price_per_kg?.message}
+            description="11 kg tank price ÷ 11. About ₱127 in Nov 2026."
+          >
+            <Input
+              id="lpg_price_per_kg"
+              inputMode="decimal"
+              disabled={disabled}
+              data-testid="input-lpg_price_per_kg"
+              {...form.register("lpg_price_per_kg")}
+            />
+          </FormField>
+          <FormField
+            name="lpg_profile_avg_kpa"
+            label="Profile average gas (kPa)"
+            error={errors.lpg_profile_avg_kpa?.message}
+            description="Time-weighted average of your gas curve; shown in the estimate."
+          >
+            <Input
+              id="lpg_profile_avg_kpa"
+              inputMode="decimal"
+              disabled={disabled}
+              data-testid="input-lpg_profile_avg_kpa"
+              {...form.register("lpg_profile_avg_kpa")}
+            />
+          </FormField>
+        </div>
+      </fieldset>
       {canUpdate ? (
         <Button type="submit" disabled={disabled} data-testid="settings-submit">
           {form.formState.isSubmitting ? <Loader2Icon className="animate-spin" /> : null}

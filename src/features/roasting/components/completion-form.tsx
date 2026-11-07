@@ -1,12 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useFieldArray, useForm, useWatch, type Path } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { z } from "zod";
 import { toast } from "sonner";
-import { Loader2Icon, PlusIcon, Trash2Icon } from "lucide-react";
+import { FlameIcon, Loader2Icon, PlusIcon, Trash2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,6 +19,8 @@ import { formatPHP, toCentavos } from "@/lib/money";
 import {
   capacityStatus,
   developmentRatioPct,
+  estimateLpgCost,
+  type LpgEstimateSettings,
   formatDuration,
   roastLossPct,
   roastYieldPct,
@@ -39,6 +41,8 @@ interface Props {
   estimatedGreenCostCentavos: number;
   roaster: { name: string; capacity_g: number; capacity_policy: string };
   existingCosts: { cost_type: string; amount: number; notes: string | null }[];
+  /** Calibration from Business settings; kg/h of 0 turns the pre-fill off. */
+  lpg: LpgEstimateSettings;
   defaults: {
     roast_level?: string | null;
     first_crack_seconds?: number | null;
@@ -59,6 +63,7 @@ export function RoastCompletionForm({
   estimatedGreenCostCentavos,
   roaster,
   existingCosts,
+  lpg,
   defaults,
 }: Props) {
   const router = useRouter();
@@ -89,6 +94,34 @@ export function RoastCompletionForm({
   const { fields, append, remove } = useFieldArray({ control: form.control, name: "costs" });
   const errors = form.formState.errors;
   const w = useWatch({ control: form.control });
+
+  // LPG pre-fill: recomputed whenever the duration changes. It only overwrites the LPG amount
+  // while that amount is empty or still equal to the last value we filled in, so a figure the
+  // roaster typed by hand is never clobbered. "Use estimate" re-applies it on demand.
+  const durationSeconds = parseMinutesToSeconds(w.total_duration_seconds as unknown as string);
+  const lpgEstimate = useMemo(
+    () =>
+      estimateLpgCost({ durationSeconds, kgPerHour: lpg.kgPerHour, pricePerKg: lpg.pricePerKg }),
+    [durationSeconds, lpg.kgPerHour, lpg.pricePerKg],
+  );
+  const lastAutoAmount = useRef<string | null>(null);
+  const lpgIndex = (w.costs ?? []).findIndex((c) => c?.cost_type === "lpg");
+  const lpgAmount = lpgIndex >= 0 ? String(w.costs?.[lpgIndex]?.amount ?? "") : null;
+  const lpgOverridden =
+    lpgAmount !== null && lpgAmount !== "" && lpgAmount !== lastAutoAmount.current;
+  function applyLpgEstimate() {
+    if (!lpgEstimate || lpgIndex < 0) return;
+    form.setValue(`costs.${lpgIndex}.amount`, lpgEstimate.amount, { shouldDirty: true });
+    lastAutoAmount.current = lpgEstimate.amount;
+  }
+  useEffect(() => {
+    if (!lpgEstimate || lpgIndex < 0) return;
+    const current = String(form.getValues(`costs.${lpgIndex}.amount`) ?? "");
+    if (current !== "" && current !== lastAutoAmount.current) return; // typed by hand
+    if (current === lpgEstimate.amount) return;
+    form.setValue(`costs.${lpgIndex}.amount`, lpgEstimate.amount, { shouldDirty: true });
+    lastAutoAmount.current = lpgEstimate.amount;
+  }, [lpgEstimate, lpgIndex, form]);
 
   const preview = useMemo(() => {
     const roasted = Number(w.roasted_weight_g);
@@ -339,6 +372,41 @@ export function RoastCompletionForm({
               </Button>
             </div>
           ))}
+          {lpg.kgPerHour > 0 && lpg.pricePerKg > 0 ? (
+            <div
+              className="bg-muted/40 text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md px-3 py-2 text-xs"
+              data-testid="lpg-estimate"
+            >
+              <FlameIcon className="text-chart-2 size-3.5 shrink-0" />
+              {lpgEstimate && durationSeconds ? (
+                <span>
+                  LPG estimate: {formatDuration(durationSeconds)} at {lpg.avgKpa} kPa average ={" "}
+                  {lpgEstimate.kg.toFixed(3)} kg × {formatPHP(Math.round(lpg.pricePerKg * 100))}
+                  /kg ={" "}
+                  <strong className="text-foreground">{formatPHP(lpgEstimate.centavos)}</strong>
+                  {lpgOverridden ? " (overridden by hand)" : " (pre-filled)"}
+                </span>
+              ) : (
+                <span>
+                  LPG is estimated from the total duration ({lpg.kgPerHour} kg/h at {lpg.avgKpa} kPa
+                  average, {formatPHP(Math.round(lpg.pricePerKg * 100))}/kg). Enter the duration to
+                  pre-fill it.
+                </span>
+              )}
+              {lpgEstimate && lpgOverridden ? (
+                <Button
+                  type="button"
+                  variant="link"
+                  size="sm"
+                  className="h-auto p-0 text-xs"
+                  onClick={applyLpgEstimate}
+                  data-testid="lpg-estimate-apply"
+                >
+                  Use estimate
+                </Button>
+              ) : null}
+            </div>
+          ) : null}
         </CardContent>
       </Card>
 

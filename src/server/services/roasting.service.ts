@@ -2,7 +2,9 @@ import "server-only";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requirePermission } from "@/lib/auth/session";
 import { validate } from "@/lib/validation";
-import { Errors } from "@/lib/errors";
+import { Errors, fromDatabaseError } from "@/lib/errors";
+import { LPG_DEFAULTS } from "@/features/settings/schemas";
+import type { LpgEstimateSettings } from "@/lib/roasting/calculations";
 import { isObjectWithin } from "@/lib/storage/paths";
 import { ROAST_ATTACHMENT_BUCKET } from "@/lib/storage/buckets";
 import { fromCentavos, toCentavos } from "@/lib/money";
@@ -267,6 +269,23 @@ export async function attachRoastFile(
     size_bytes: Math.round(input.sizeBytes),
     uploaded_by: ctx.user.id,
   });
+}
+
+/** Calibration for the LPG pre-fill on roast completion (any member may read business_settings). */
+export async function getLpgEstimateSettings(): Promise<LpgEstimateSettings> {
+  const ctx = await requirePermission("roasting.manage");
+  const db = await createSupabaseServerClient();
+  const { data, error } = await db
+    .from("business_settings")
+    .select("lpg_price_per_kg, lpg_kg_per_hour, lpg_profile_avg_kpa")
+    .eq("business_id", ctx.business.businessId)
+    .maybeSingle();
+  if (error) throw fromDatabaseError(error);
+  return {
+    pricePerKg: Number(data?.lpg_price_per_kg ?? LPG_DEFAULTS.lpg_price_per_kg),
+    kgPerHour: Number(data?.lpg_kg_per_hour ?? LPG_DEFAULTS.lpg_kg_per_hour),
+    avgKpa: Number(data?.lpg_profile_avg_kpa ?? LPG_DEFAULTS.lpg_profile_avg_kpa),
+  };
 }
 
 export async function deleteRoastAttachment(id: string) {

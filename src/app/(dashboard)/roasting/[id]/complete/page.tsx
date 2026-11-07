@@ -3,7 +3,11 @@ import { redirect } from "next/navigation";
 import { PageHeader } from "@/components/shared/page-header";
 import { AccessDenied } from "@/components/shared/access-denied";
 import { getSessionContext, can } from "@/lib/auth/session";
-import { getRoastBatch, getRoastFormOptions } from "@/server/services/roasting.service";
+import {
+  getLpgEstimateSettings,
+  getRoastBatch,
+  getRoastFormOptions,
+} from "@/server/services/roasting.service";
 import { RoastCompletionForm } from "@/features/roasting/components/completion-form";
 import { toCentavos } from "@/lib/money";
 
@@ -12,9 +16,10 @@ export default async function CompleteRoastPage({ params }: PageProps<"/roasting
   const ctx = await getSessionContext();
   if (!can(ctx, "roasting.manage"))
     return <AccessDenied message="Your role cannot complete roast batches." />;
-  const [{ summary, detail }, options] = await Promise.all([
+  const [{ summary, detail }, options, lpg] = await Promise.all([
     getRoastBatch(id),
     getRoastFormOptions(),
+    getLpgEstimateSettings(),
   ]);
   if (detail.status !== "draft" && detail.status !== "in_progress") redirect(`/roasting/${id}`);
 
@@ -51,6 +56,7 @@ export default async function CompleteRoastPage({ params }: PageProps<"/roasting
             capacity_policy: "warn",
           }
         }
+        lpg={lpg}
         existingCosts={(detail.roast_batch_costs ?? []).map((c) => ({
           cost_type: c.cost_type,
           amount: c.amount,

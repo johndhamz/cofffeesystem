@@ -172,3 +172,41 @@ export type RoastLevel = (typeof ROAST_LEVELS)[number]["value"];
 export const ROAST_LEVEL_LABELS: Record<string, string> = Object.fromEntries(
   ROAST_LEVELS.map((l) => [l.value, l.label]),
 );
+
+export interface LpgEstimateSettings {
+  pricePerKg: number;
+  kgPerHour: number;
+  /** Informational: the profile's time-weighted average gas pressure, shown in the breakdown. */
+  avgKpa: number;
+}
+
+export interface LpgEstimateInput {
+  /** Total roast duration in whole seconds. */
+  durationSeconds: number | null | undefined;
+  /** LPG consumed per hour at the business's standard gas profile (Business settings). */
+  kgPerHour: number;
+  /** Retail LPG price per kg (Business settings). */
+  pricePerKg: number;
+}
+
+export interface LpgEstimate {
+  kg: number;
+  centavos: number;
+  /** Amount as the form expects it ("4.23"). */
+  amount: string;
+}
+
+/**
+ * Fuel cost from duration alone: the gas curve is fixed to the business's standard profile, so
+ * kg = hours x kg/h at that profile, cost = kg x price. Returns null when any input is unusable
+ * or the estimate is disabled (kg/h or price of 0).
+ */
+export function estimateLpgCost(input: LpgEstimateInput): LpgEstimate | null {
+  const { durationSeconds, kgPerHour, pricePerKg } = input;
+  if (!Number.isFinite(durationSeconds ?? NaN) || (durationSeconds as number) <= 0) return null;
+  if (!Number.isFinite(kgPerHour) || !Number.isFinite(pricePerKg)) return null;
+  if (kgPerHour <= 0 || pricePerKg <= 0) return null;
+  const kg = ((durationSeconds as number) / 3600) * kgPerHour;
+  const centavos = Math.round(kg * pricePerKg * 100);
+  return { kg, centavos, amount: (centavos / 100).toFixed(2) };
+}

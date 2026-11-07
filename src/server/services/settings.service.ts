@@ -61,6 +61,9 @@ export async function updateBusinessSettings(input: unknown) {
     default_roaster_id: values.default_roaster_id ?? null,
     default_location_id: values.default_location_id ?? null,
     require_mfa: values.require_mfa,
+    lpg_price_per_kg: values.lpg_price_per_kg,
+    lpg_kg_per_hour: values.lpg_kg_per_hour,
+    lpg_profile_avg_kpa: values.lpg_profile_avg_kpa,
   });
 }
 

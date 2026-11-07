@@ -86,6 +86,32 @@ test.describe("roast production as owner", { tag: ["@production", "@regression"]
     await expect(page.locator('[data-movement-type="roast_output"]').first()).toBeVisible();
   });
 
+  test("LPG cost is pre-filled from the duration and keeps a hand-typed amount", async ({
+    page,
+    roasting,
+  }) => {
+    await roasting.startNew();
+    await roasting.fillInput(0, lotCode, "500");
+    await roasting.createDraft();
+    await roasting.completeLink().click();
+    await roasting.completionForm().waitFor();
+    const lpgAmount = page.getByTestId("input-cost-amount").first();
+    await expect(page.getByTestId("lpg-estimate")).toContainText("Enter the duration");
+    // defaults: 0.2 kg/h x 10 min = 0.0333 kg x PHP 127/kg = PHP 4.23
+    await page.getByTestId("input-duration").fill("10:00");
+    await expect(lpgAmount).toHaveValue("4.23");
+    await expect(page.getByTestId("lpg-estimate")).toContainText("pre-filled");
+    await page.getByTestId("input-duration").fill("12:00");
+    await expect(lpgAmount).toHaveValue("5.08");
+    // a figure typed by hand survives further duration edits, and can be reverted on demand
+    await lpgAmount.fill("40");
+    await page.getByTestId("input-duration").fill("9:30");
+    await expect(lpgAmount).toHaveValue("40");
+    await expect(page.getByTestId("lpg-estimate")).toContainText("overridden");
+    await page.getByTestId("lpg-estimate-apply").click();
+    await expect(lpgAmount).toHaveValue("4.02");
+  });
+
   test("completed batch is immutable; void is available with a reason", async ({ page }) => {
     await page.goto(batchUrl);
     await expect(page.getByTestId("complete-link")).toHaveCount(0);

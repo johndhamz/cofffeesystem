@@ -59,14 +59,14 @@ isOneToOne: false
                   ]
                 },"business_settings": {
                   Row: {
-                    "business_id": string,"costing_method": string,"created_at": string,"currency": string,"default_location_id": string | null,"default_roaster_id": string | null,"id": string,"inventory_weight_unit": string,"require_mfa": boolean,"timezone": string,"updated_at": string,"updated_by": string | null
+                    "business_id": string,"costing_method": string,"created_at": string,"currency": string,"default_location_id": string | null,"default_roaster_id": string | null,"id": string,"inventory_weight_unit": string,"lpg_kg_per_hour": number,"lpg_price_per_kg": number,"lpg_profile_avg_kpa": number,"require_mfa": boolean,"timezone": string,"updated_at": string,"updated_by": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "business_id": string,"costing_method"?: string,"created_at"?: string,"currency"?: string,"default_location_id"?: string | null,"default_roaster_id"?: string | null,"id"?: string,"inventory_weight_unit"?: string,"require_mfa"?: boolean,"timezone"?: string,"updated_at"?: string,"updated_by"?: string | null
+                    "business_id": string,"costing_method"?: string,"created_at"?: string,"currency"?: string,"default_location_id"?: string | null,"default_roaster_id"?: string | null,"id"?: string,"inventory_weight_unit"?: string,"lpg_kg_per_hour"?: number,"lpg_price_per_kg"?: number,"lpg_profile_avg_kpa"?: number,"require_mfa"?: boolean,"timezone"?: string,"updated_at"?: string,"updated_by"?: string | null
                   }
                   Update: {
-                    "business_id"?: string,"costing_method"?: string,"created_at"?: string,"currency"?: string,"default_location_id"?: string | null,"default_roaster_id"?: string | null,"id"?: string,"inventory_weight_unit"?: string,"require_mfa"?: boolean,"timezone"?: string,"updated_at"?: string,"updated_by"?: string | null
+                    "business_id"?: string,"costing_method"?: string,"created_at"?: string,"currency"?: string,"default_location_id"?: string | null,"default_roaster_id"?: string | null,"id"?: string,"inventory_weight_unit"?: string,"lpg_kg_per_hour"?: number,"lpg_price_per_kg"?: number,"lpg_profile_avg_kpa"?: number,"require_mfa"?: boolean,"timezone"?: string,"updated_at"?: string,"updated_by"?: string | null
                   }
                   Relationships: [
                     {
