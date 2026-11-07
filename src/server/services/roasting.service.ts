@@ -3,6 +3,8 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requirePermission } from "@/lib/auth/session";
 import { validate } from "@/lib/validation";
 import { Errors } from "@/lib/errors";
+import { isObjectWithin } from "@/lib/storage/paths";
+import { ROAST_ATTACHMENT_BUCKET } from "@/lib/storage/buckets";
 import { fromCentavos, toCentavos } from "@/lib/money";
 import { capacityStatus } from "@/lib/roasting/calculations";
 import { roastingRepository, type RoastListQuery } from "@/server/repositories/roasting.repository";
@@ -17,7 +19,7 @@ import {
   voidRoastSchema,
 } from "@/features/roasting/schemas";
 
-const ATTACHMENT_BUCKET = "roast-attachments";
+const ATTACHMENT_BUCKET = ROAST_ATTACHMENT_BUCKET;
 const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
 
 export async function listRoastBatches(query: RoastListQuery) {
@@ -235,27 +237,34 @@ const FILE_TYPES: Record<string, string> = {
   ".webp": "image",
 };
 
-/** Uploads through the user's session so Storage RLS applies. CSV parsing is deferred to a later phase. */
-export async function uploadRoastAttachment(batchId: string, file: File) {
+/**
+ * Records an attachment the browser already uploaded straight to Storage (see `uploadToBucket`).
+ * Storage RLS, the bucket's MIME allow-list and size limit were enforced on the upload itself; here
+ * we only accept objects inside this business's folder for this batch and confirm they exist.
+ */
+export async function attachRoastFile(
+  batchId: string,
+  input: { path: string; fileName: string; sizeBytes: number },
+) {
   const ctx = await requirePermission("roasting.manage");
-  if (!file || file.size === 0)
-    throw Errors.validation("Choose a file to upload.", { file: ["Choose a file"] });
-  if (file.size > MAX_ATTACHMENT_BYTES)
+  if (!isObjectWithin(input.path, ctx.business.businessId, batchId))
+    throw Errors.validation("Attachment path does not belong to this roast batch.");
+  if (
+    !Number.isFinite(input.sizeBytes) ||
+    input.sizeBytes <= 0 ||
+    input.sizeBytes > MAX_ATTACHMENT_BYTES
+  )
     throw Errors.validation("File is larger than 10 MB.", { file: ["Maximum size is 10 MB"] });
-  const ext = (file.name.match(/\.[a-z0-9]+$/i)?.[0] ?? "").toLowerCase();
+  const ext = (input.fileName.match(/\.[a-z0-9]+$/i)?.[0] ?? "").toLowerCase();
   const fileType = FILE_TYPES[ext] ?? "other";
-  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 100);
-  const path = `${ctx.business.businessId}/${batchId}/${Date.now()}-${safeName}`;
   const db = await createSupabaseServerClient();
-  const { error } = await db.storage
-    .from(ATTACHMENT_BUCKET)
-    .upload(path, file, { contentType: file.type || "application/octet-stream", upsert: false });
-  if (error) throw Errors.validation(`Upload failed: ${error.message}`);
+  const probe = await db.storage.from(ATTACHMENT_BUCKET).createSignedUrl(input.path, 60);
+  if (probe.error) throw Errors.validation("Uploaded file was not found. Please try again.");
   return roastingRepository(db).addAttachment(ctx.business.businessId, batchId, {
-    storage_path: path,
-    file_name: file.name,
+    storage_path: input.path,
+    file_name: input.fileName.slice(0, 200),
     file_type: fileType,
-    size_bytes: file.size,
+    size_bytes: Math.round(input.sizeBytes),
     uploaded_by: ctx.user.id,
   });
 }

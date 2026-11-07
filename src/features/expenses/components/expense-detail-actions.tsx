@@ -1,12 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, useWatch, type Path } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { z } from "zod";
 import { toast } from "sonner";
-import { BanIcon, Link2Icon, Loader2Icon, PencilIcon, Trash2Icon, UploadIcon } from "lucide-react";
+import { BanIcon, Link2Icon, Loader2Icon, PencilIcon, Trash2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -24,12 +24,7 @@ import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { FormField } from "@/components/shared/form-field";
 import { formatPHP, toCentavos } from "@/lib/money";
 import { allocationSchema, type AllocationInput } from "../schemas";
-import {
-  addAllocationAction,
-  removeAllocationAction,
-  uploadReceiptAction,
-  voidExpenseAction,
-} from "../actions";
+import { addAllocationAction, removeAllocationAction, voidExpenseAction } from "../actions";
 import { ExpenseFormDialog, type ExpenseOptions } from "./expense-form-dialog";
 import type { ExpenseFormValues } from "../schemas";
 
@@ -75,7 +70,6 @@ export function ExpenseDetailActions({
       {canAllocate && unallocated > 0 ? (
         <AllocationDialog expenseId={expense.id} targets={targets} max={unallocated} />
       ) : null}
-      <ReceiptUpload expenseId={expense.id} />
       <ConfirmDialog
         title="Void this expense?"
         confirmLabel="Void"
@@ -227,39 +221,5 @@ export function RemoveAllocationButton({ expenseId, id }: { expenseId: string; i
     >
       <Trash2Icon />
     </Button>
-  );
-}
-
-function ReceiptUpload({ expenseId }: { expenseId: string }) {
-  const router = useRouter();
-  const ref = useRef<HTMLInputElement>(null);
-  const [busy, setBusy] = useState(false);
-  return (
-    <form
-      className="flex items-center gap-2"
-      onSubmit={async (e) => {
-        e.preventDefault();
-        const fd = new FormData(e.currentTarget);
-        setBusy(true);
-        const r = await uploadReceiptAction(expenseId, fd);
-        setBusy(false);
-        if (!r.ok) return toast.error(r.error.message);
-        toast.success("Receipt attached");
-        if (ref.current) ref.current.value = "";
-        router.refresh();
-      }}
-    >
-      <Input
-        ref={ref}
-        type="file"
-        name="file"
-        accept="image/*,application/pdf"
-        className="max-w-56"
-        data-testid="receipt-input"
-      />
-      <Button type="submit" variant="outline" size="sm" disabled={busy}>
-        {busy ? <Loader2Icon className="animate-spin" /> : <UploadIcon />} Receipt
-      </Button>
-    </form>
   );
 }

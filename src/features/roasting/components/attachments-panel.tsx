@@ -1,41 +1,45 @@
 "use client";
 
-import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { FileIcon, ImageIcon, Loader2Icon, Trash2Icon, UploadIcon } from "lucide-react";
+import { FileIcon, ImageIcon, Trash2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { deleteRoastAttachmentAction, uploadRoastAttachmentAction } from "../actions";
+import { FileUploadButton } from "@/components/shared/file-upload-button";
+import { uploadToBucket } from "@/lib/storage/client-upload";
+import { ROAST_ATTACHMENT_BUCKET } from "@/lib/storage/buckets";
+import { objectPath } from "@/lib/storage/paths";
+import { attachRoastFileAction, deleteRoastAttachmentAction } from "../actions";
 import type { Tables } from "@/types";
 
 type Attachment = Tables<"roast_attachments"> & { url: string | null };
 
 export function AttachmentsPanel({
   batchId,
+  businessId,
   attachments,
   canEdit,
 }: {
   batchId: string;
+  businessId: string;
   attachments: Attachment[];
   canEdit: boolean;
 }) {
   const router = useRouter();
-  const [uploading, setUploading] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    const file = fd.get("file") as File | null;
-    if (!file || file.size === 0) return toast.error("Choose a file first");
-    setUploading(true);
-    const r = await uploadRoastAttachmentAction(batchId, fd);
-    setUploading(false);
-    if (!r.ok) return toast.error(r.error.message);
+  /** Browser -> Storage upload under RLS, then the server records the row. Returns an error message or null. */
+  async function onFile(file: File) {
+    const path = objectPath(businessId, batchId, file.name);
+    const up = await uploadToBucket(ROAST_ATTACHMENT_BUCKET, path, file);
+    if (!up.ok) return up.message;
+    const r = await attachRoastFileAction(batchId, {
+      path,
+      fileName: file.name,
+      sizeBytes: file.size,
+    });
+    if (!r.ok) return r.error.message;
     toast.success("Attachment uploaded");
-    if (inputRef.current) inputRef.current.value = "";
     router.refresh();
+    return null;
   }
 
   return (
@@ -89,28 +93,18 @@ export function AttachmentsPanel({
         </ul>
       )}
       {canEdit ? (
-        <form
-          onSubmit={onSubmit}
-          className="flex flex-wrap items-center gap-2"
-          data-testid="attachment-form"
-        >
-          <Input
-            ref={inputRef}
-            type="file"
-            name="file"
+        <div className="flex flex-wrap items-center gap-3" data-testid="attachment-form">
+          <FileUploadButton
             accept=".alog,.csv,.png,.jpg,.jpeg,.webp,image/*,text/csv"
-            className="max-w-xs"
-            data-testid="attachment-input"
+            label="Upload attachment"
+            inputTestId="attachment-input"
+            buttonTestId="attachment-upload"
+            onFile={onFile}
           />
-          <Button
-            type="submit"
-            variant="outline"
-            disabled={uploading}
-            data-testid="attachment-upload"
-          >
-            {uploading ? <Loader2Icon className="animate-spin" /> : <UploadIcon />} Upload
-          </Button>
-        </form>
+          <span className="text-muted-foreground text-xs">
+            Artisan logs, CSV or images up to 10 MB. Uploads as soon as you pick a file.
+          </span>
+        </div>
       ) : null}
     </div>
   );

@@ -65,6 +65,18 @@ changes are recorded in `audit_logs` with the acting user.
 `auth.admin.mfa.deleteFactor({ id, userId })` (or delete the row from `auth.mfa_factors` in the SQL
 editor) for that user only, then ask them to re-enrol. Never disable MFA for everyone.
 
+## File uploads
+
+Receipts and roast attachments go **straight from the browser to Supabase Storage** using the
+user's own session (public anon key + cookies), never through a Next.js server action and never
+with the service-role key. Storage RLS (`expense_receipts_*`, `roast_attachments_storage_*`)
+confines writes to `<business_id>/<document_id>/…` for users holding `expenses.manage` /
+`roasting.manage`, and the buckets enforce the MIME allow-list and the 10 MB size limit. A server
+action then records the object path; it re-checks that the path sits inside the caller's business
+and document folder (`isObjectWithin`) and that the object exists before updating the row. This
+keeps multi-megabyte photos clear of the 1 MB server-action body limit and Vercel's 4.5 MB
+request cap.
+
 ## Hardening already in place
 
 - Security headers (`X-Frame-Options`, `nosniff`, referrer and permissions policies) in `next.config.ts`.

@@ -13,7 +13,7 @@ import {
   saveMeasurement,
   startRoastBatch,
   updateRoastBatchDraft,
-  uploadRoastAttachment,
+  attachRoastFile,
   voidRoastBatch,
 } from "@/server/services/roasting.service";
 
@@ -145,13 +145,12 @@ export async function deleteRoastEventAction(batchId: string, id: string): Promi
   }
 }
 
-export async function uploadRoastAttachmentAction(
+export async function attachRoastFileAction(
   batchId: string,
-  formData: FormData,
+  input: { path: string; fileName: string; sizeBytes: number },
 ): Promise<ActionResult> {
   try {
-    const file = formData.get("file");
-    await uploadRoastAttachment(batchId, file as File);
+    await attachRoastFile(batchId, input);
     revalidatePath(`/roasting/${batchId}`);
     return ok(undefined);
   } catch (error) {

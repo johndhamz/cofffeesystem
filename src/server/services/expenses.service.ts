@@ -3,6 +3,8 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requirePermission } from "@/lib/auth/session";
 import { validate } from "@/lib/validation";
 import { Errors } from "@/lib/errors";
+import { isObjectWithin } from "@/lib/storage/paths";
+import { RECEIPT_BUCKET } from "@/lib/storage/buckets";
 import { fromCentavos, toCentavos } from "@/lib/money";
 import {
   expensesRepository,
@@ -11,7 +13,7 @@ import {
 import { masterDataRepository } from "@/server/repositories/master-data.repository";
 import { allocationSchema, expenseSchema, voidExpenseSchema } from "@/features/expenses/schemas";
 
-const BUCKET = "expense-receipts";
+const BUCKET = RECEIPT_BUCKET;
 
 export async function listExpenses(query: ExpenseListQuery) {
   const ctx = await requirePermission("expenses.read");
@@ -131,21 +133,25 @@ export async function removeAllocation(id: string) {
   await expensesRepository(db).removeAllocation(ctx.business.businessId, id);
 }
 
-export async function uploadReceipt(expenseId: string, file: File) {
+/**
+ * Records a receipt the browser already uploaded straight to Storage (see `uploadToBucket`).
+ * The object must sit inside this business's folder for this expense; Storage RLS already
+ * guaranteed the caller could only write there, and we confirm the object really exists before
+ * pointing the expense at it. A previous receipt is removed so the bucket never holds orphans.
+ */
+export async function attachReceipt(expenseId: string, path: string) {
   const ctx = await requirePermission("expenses.manage");
-  if (!file || file.size === 0)
-    throw Errors.validation("Choose a file to upload.", { file: ["Choose a file"] });
-  if (file.size > 10 * 1024 * 1024) throw Errors.validation("File is larger than 10 MB.");
+  if (!isObjectWithin(path, ctx.business.businessId, expenseId))
+    throw Errors.validation("Receipt path does not belong to this expense.");
   const db = await createSupabaseServerClient();
   const repo = expensesRepository(db);
   const existing = await repo.raw(ctx.business.businessId, expenseId);
   if (!existing) throw Errors.notFound("Expense");
-  const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 100);
-  const path = `${ctx.business.businessId}/${expenseId}/${Date.now()}-${safe}`;
-  const { error } = await db.storage
-    .from(BUCKET)
-    .upload(path, file, { contentType: file.type || "application/octet-stream" });
-  if (error) throw Errors.validation(`Upload failed: ${error.message}`);
-  if (existing.receipt_path) await db.storage.from(BUCKET).remove([existing.receipt_path]);
-  return repo.update(ctx.business.businessId, expenseId, { receipt_path: path });
+  if (existing.is_voided) throw Errors.validation("Voided expenses cannot be changed.");
+  const probe = await db.storage.from(BUCKET).createSignedUrl(path, 60);
+  if (probe.error) throw Errors.validation("Uploaded file was not found. Please try again.");
+  const updated = await repo.update(ctx.business.businessId, expenseId, { receipt_path: path });
+  if (existing.receipt_path && existing.receipt_path !== path)
+    await db.storage.from(BUCKET).remove([existing.receipt_path]);
+  return updated;
 }

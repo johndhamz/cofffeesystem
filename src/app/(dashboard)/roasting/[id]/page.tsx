@@ -286,6 +286,7 @@ export default async function RoastDetailPage({ params }: PageProps<"/roasting/[
           <CardContent>
             <AttachmentsPanel
               batchId={detail.id}
+              businessId={ctx!.business!.businessId}
               attachments={detail.roast_attachments ?? []}
               canEdit={editable}
             />

@@ -147,7 +147,7 @@ test.describe("negative paths", { tag: ["@regression", "@security"] }, () => {
       mimeType: "application/x-msdownload",
       buffer: Buffer.from("MZ not really"),
     });
-    await page.getByTestId("attachment-upload").click();
+    // Choosing a file uploads it immediately (no separate submit step).
     await expect(page.getByText(/Upload failed|mime type|not allowed/i)).toBeVisible();
     await expect(page.getByTestId("attachment-row")).toHaveCount(0);
     await page.getByTestId("attachment-input").setInputFiles({
@@ -155,7 +155,6 @@ test.describe("negative paths", { tag: ["@regression", "@security"] }, () => {
       mimeType: "image/png",
       buffer: Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
     });
-    await page.getByTestId("attachment-upload").click();
     await expect(page.getByTestId("attachment-row")).toHaveCount(1);
   });
 

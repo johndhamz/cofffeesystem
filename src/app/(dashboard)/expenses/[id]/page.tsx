@@ -14,6 +14,7 @@ import {
   ExpenseDetailActions,
   RemoveAllocationButton,
 } from "@/features/expenses/components/expense-detail-actions";
+import { ReceiptPanel } from "@/features/expenses/components/receipt-panel";
 
 const TREATMENT = Object.fromEntries(COST_TREATMENTS.map((t) => [t.value, t]));
 const METHOD: Record<string, string> = Object.fromEntries(
@@ -142,19 +143,12 @@ export default async function ExpenseDetailPage({ params }: PageProps<"/expenses
             <CardTitle className="text-base">Receipt</CardTitle>
           </CardHeader>
           <CardContent>
-            {receiptUrl ? (
-              <a
-                href={receiptUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="text-sm underline"
-                data-testid="receipt-link"
-              >
-                Open attached receipt
-              </a>
-            ) : (
-              <p className="text-muted-foreground text-sm">No receipt attached.</p>
-            )}
+            <ReceiptPanel
+              expenseId={row.id}
+              businessId={ctx!.business!.businessId}
+              receiptUrl={receiptUrl}
+              canManage={can(ctx, "expenses.manage") && !row.is_voided}
+            />
             {row.is_voided ? (
               <p className="text-destructive mt-3 text-sm">Voided — excluded from reports.</p>
             ) : null}

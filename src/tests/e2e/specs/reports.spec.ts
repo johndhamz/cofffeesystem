@@ -38,6 +38,15 @@ test.describe(
       await expect(page.getByTestId("expense-amount")).toContainText("1,250.50");
       await expect(page.getByTestId("expense-treatment")).toContainText("Roast production");
       await expect(page.getByTestId("expense-treatment")).toContainText("inside inventory cost");
+      // Receipt: picking a file uploads it straight away and the link appears.
+      await expect(page.getByTestId("receipt-link")).toHaveCount(0);
+      await page.getByTestId("receipt-input").setInputFiles({
+        name: "receipt photo.png",
+        mimeType: "image/png",
+        buffer: Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
+      });
+      await expect(page.getByTestId("receipt-link")).toBeVisible();
+      await expect(page.getByTestId("receipt-upload")).toHaveText(/Replace receipt/);
       await page.getByTestId("allocate-expense").click();
       await page.getByTestId("allocation-dialog").waitFor();
       const target = page.getByTestId("select-target");

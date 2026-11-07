@@ -63,8 +63,8 @@ shows the exact seconds it will save under the field. First crack is also in min
    the grams of each. A warning shows if you exceed the roaster's capacity (the Yoshan DY-2kg is
    2,000 g).
 2. **Start roast**, then record measurements (time, bean/environment temperature, gas, airflow,
-   drum) and events (first crack, drop). The curve chart updates as you add readings. Attach an
-   Artisan log or a screenshot if you have one.
+   drum) and events (first crack, drop). The curve chart updates as you add readings. **Upload
+   attachment** adds an Artisan log or a screenshot; it uploads as soon as you pick the file.
 3. **Complete roast**: roasted output grams, roast level, duration, first-crack time and the
    LPG/labor costs. The screen previews loss %, yield % and cost per roasted kg. Completing consumes
    the green lots and creates roasted bulk stock in one step. Mistake? **Void** reverses it while
@@ -115,8 +115,10 @@ Uploading the same file twice never duplicates orders.
 
 **Expenses → Record expense** with a category and a _cost treatment_. Choose _Roast production_ or
 _Packaging production_ for costs you already entered on batches (LPG, labor) so they are not
-counted twice; _Selling_, _Administrative_ and _Other operating_ are period expenses. Attach the
-receipt photo. Owners can _Allocate_ an expense to the batch or session it belongs to.
+counted twice; _Selling_, _Administrative_ and _Other operating_ are period expenses. On the
+expense page, **Attach receipt** opens your photos or files; the upload starts as soon as you pick
+one (PNG, JPEG, WebP or PDF up to 10 MB) and _Open attached receipt_ appears when it is done.
+Pick again to replace it. Owners can _Allocate_ an expense to the batch or session it belongs to.
 
 ## Dashboard and reports
 

@@ -7,7 +7,7 @@ import {
   createExpense,
   removeAllocation,
   updateExpense,
-  uploadReceipt,
+  attachReceipt,
   voidExpense,
 } from "@/server/services/expenses.service";
 
@@ -80,12 +80,9 @@ export async function removeAllocationAction(expenseId: string, id: string): Pro
   }
 }
 
-export async function uploadReceiptAction(
-  expenseId: string,
-  formData: FormData,
-): Promise<ActionResult> {
+export async function attachReceiptAction(expenseId: string, path: string): Promise<ActionResult> {
   try {
-    await uploadReceipt(expenseId, formData.get("file") as File);
+    await attachReceipt(expenseId, path);
     revalidate(expenseId);
     return ok(undefined);
   } catch (error) {
